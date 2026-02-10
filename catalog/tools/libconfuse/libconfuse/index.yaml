@@ -1,0 +1,12 @@
+spec_version: 1
+id: tool.libconfuse.libconfuse
+type: index
+
+aliases:
+  latest: "3.3"
+  stable: "3.3"
+
+versions:
+  - version: "3.3"
+    file: "3.3.yaml"
+    status: stable

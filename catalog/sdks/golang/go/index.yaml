@@ -1,0 +1,15 @@
+spec_version: 1
+id: sdk.golang.go
+type: index
+
+aliases:
+  latest: "1.25.7"
+  stable: "1.25.7"
+
+versions:
+  - version: "1.25.7"
+    file: "1.25.7.yaml"
+    status: stable
+  - version: "1.24.4"
+    file: "1.24.4.yaml"
+    status: stable

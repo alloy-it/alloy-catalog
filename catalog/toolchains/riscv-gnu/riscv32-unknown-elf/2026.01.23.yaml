@@ -1,0 +1,28 @@
+spec_version: 1
+id: toolchain.riscv-gnu.riscv32-unknown-elf
+version: "2026.01.23"
+
+name: "RISC-V GNU Toolchain for 32-bit RISC-V bare-metal (elf)"
+homepage: "https://github.com/riscv-collab/riscv-gnu-toolchain"
+license: "GPL-3.0"
+
+capabilities:
+  - toolchain.gcc
+  - target.riscv32-elf
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/2026.01.23/riscv32-elf-ubuntu-22.04-gcc.tar.xz"
+        sha256: "4cfa8adababe5e15371f253565fb057ffc5017fb4ebb11b41be8abc074f66243"
+
+install_hints:
+  creates: "bin/riscv32-unknown-elf-gcc"
+  env_vars:
+    CROSS_COMPILE: "riscv32-unknown-elf-"
+
+lifecycle:
+  status: stable
+  released_at: "2026-01-23"

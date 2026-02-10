@@ -1,0 +1,31 @@
+spec_version: 1
+id: toolchain.arm-gnu.arm-none-linux-gnueabihf
+version: "13.3.rel1"
+
+name: "ARM GNU Toolchain for ARM Linux (gnueabihf, 32-bit hard-float)"
+homepage: "https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain"
+license: "GPL-3.0"
+
+capabilities:
+  - toolchain.gcc
+  - target.arm-linux-gnueabihf
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz"
+        sha256: "95c011cee430e64dd6087c75c800f04b9c49832cc1000b8e4a59717aa8648d9f"
+      linux/arm64:
+        url: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-aarch64-arm-none-linux-gnueabihf.tar.xz"
+        sha256: "b55ae32544d274665e9844029c28f8b8bc00fdbb2d56ba6d90a4f95ca721dca4"
+
+install_hints:
+  creates: "bin/arm-none-linux-gnueabihf-gcc"
+  env_vars:
+    CROSS_COMPILE: "arm-none-linux-gnueabihf-"
+
+lifecycle:
+  status: stable
+  released_at: "2024-06-01"

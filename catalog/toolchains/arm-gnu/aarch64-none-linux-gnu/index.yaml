@@ -1,0 +1,12 @@
+spec_version: 1
+id: toolchain.arm-gnu.aarch64-none-linux-gnu
+type: index
+
+aliases:
+  latest: "13.3.rel1"
+  stable: "13.3.rel1"
+
+versions:
+  - version: "13.3.rel1"
+    file: "13.3.rel1.yaml"
+    status: stable

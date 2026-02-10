@@ -1,0 +1,28 @@
+spec_version: 1
+id: toolchain.ti.msp430-elf-gcc
+version: "9.3.1.11"
+
+name: "TI MSP430 GCC (Mitto Systems open source compiler)"
+homepage: "https://www.ti.com/tool/MSP430-GCC-OPENSOURCE"
+license: "GPL-3.0"
+
+capabilities:
+  - toolchain.gcc
+  - target.msp430
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-LlCjWuAbzH/9.3.1.2/msp430-gcc-9.3.1.11_linux64.tar.bz2"
+        sha256: "a1b2c3d4e5f60718293645564738495051627384950617283940516273849506"
+
+install_hints:
+  creates: "bin/msp430-elf-gcc"
+  env_vars:
+    CROSS_COMPILE: "msp430-elf-"
+
+lifecycle:
+  status: stable
+  released_at: "2021-07-22"

@@ -1,0 +1,12 @@
+spec_version: 1
+id: sdk.zephyr.zephyr-sdk
+type: index
+
+aliases:
+  latest: "0.17.0"
+  stable: "0.17.0"
+
+versions:
+  - version: "0.17.0"
+    file: "0.17.0.yaml"
+    status: stable

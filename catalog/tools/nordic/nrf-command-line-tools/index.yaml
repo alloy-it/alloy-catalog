@@ -1,0 +1,12 @@
+spec_version: 1
+id: tool.nordic.nrf-command-line-tools
+type: index
+
+aliases:
+  latest: "10.24.2"
+  stable: "10.24.2"
+
+versions:
+  - version: "10.24.2"
+    file: "10.24.2.yaml"
+    status: stable

@@ -1,0 +1,31 @@
+spec_version: 1
+id: toolchain.espressif.xtensa-esp-elf
+version: "15.2.0_20251204"
+
+name: "Xtensa ESP32 GCC (Espressif crosstool-NG)"
+homepage: "https://github.com/espressif/crosstool-NG"
+license: "GPL-3.0-with-GCC-exception"
+
+capabilities:
+  - toolchain.gcc
+  - target.xtensa-esp32
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/xtensa-esp-elf-15.2.0_20251204-x86_64-linux-gnu.tar.xz"
+        sha256: "3d50f5cd5f173acfd524e07c1cd69bc99585731a415ca2e5bce879997fe602b8"
+      linux/arm64:
+        url: "https://github.com/espressif/crosstool-NG/releases/download/esp-15.2.0_20251204/xtensa-esp-elf-15.2.0_20251204-aarch64-linux-gnu.tar.xz"
+        sha256: "c8a8255009803036ba3def98a97a7134ee5a8ac5db048425e126fcf07f27ce1c"
+
+install_hints:
+  creates: "bin/xtensa-esp-elf-gcc"
+  env_vars:
+    CROSS_COMPILE: "xtensa-esp-elf-"
+
+lifecycle:
+  status: stable
+  released_at: "2025-12-04"

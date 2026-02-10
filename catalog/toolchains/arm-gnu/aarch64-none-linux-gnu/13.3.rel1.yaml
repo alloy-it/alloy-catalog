@@ -1,0 +1,31 @@
+spec_version: 1
+id: toolchain.arm-gnu.aarch64-none-linux-gnu
+version: "13.3.rel1"
+
+name: "ARM GNU Toolchain for AArch64 Linux (64-bit)"
+homepage: "https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain"
+license: "GPL-3.0"
+
+capabilities:
+  - toolchain.gcc
+  - target.aarch64-linux-gnu
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+        sha256: "f0d87abe3dcc24797823f41a8c4eef0c8a76e82ab6ce30f43dc5f97c4b2b1b46"
+      linux/arm64:
+        url: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
+        sha256: "b3a7f1e88bf36fc7bb6cedd5d62a0e3e8a0eb2d30b61cdad7bcea02f7a303a94"
+
+install_hints:
+  creates: "bin/aarch64-none-linux-gnu-gcc"
+  env_vars:
+    CROSS_COMPILE: "aarch64-none-linux-gnu-"
+
+lifecycle:
+  status: stable
+  released_at: "2024-06-01"

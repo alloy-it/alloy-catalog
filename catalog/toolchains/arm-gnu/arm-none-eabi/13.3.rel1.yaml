@@ -1,0 +1,32 @@
+spec_version: 1
+id: toolchain.arm-gnu.arm-none-eabi
+version: "13.3.rel1"
+
+name: "ARM GNU Toolchain for Bare-Metal (arm-none-eabi)"
+homepage: "https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain"
+license: "GPL-3.0"
+
+capabilities:
+  - toolchain.gcc
+  - target.arm-none-eabi
+  - target.cortex-m
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi.tar.xz"
+        sha256: "95c011cee430e64dd6087c75c800f04b9c49832cc1000b8e4a59717aa8648d9f"
+      linux/arm64:
+        url: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-aarch64-arm-none-eabi.tar.xz"
+        sha256: "c8824bffd057afce2259f7618254e840715f33523a3d4e4294f471208f976764"
+
+install_hints:
+  creates: "bin/arm-none-eabi-gcc"
+  env_vars:
+    CROSS_COMPILE: "arm-none-eabi-"
+
+lifecycle:
+  status: stable
+  released_at: "2024-06-01"

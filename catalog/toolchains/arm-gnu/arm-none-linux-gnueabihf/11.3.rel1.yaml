@@ -1,0 +1,32 @@
+spec_version: 1
+id: toolchain.arm-gnu.arm-none-linux-gnueabihf
+version: "11.3.rel1"
+
+name: "ARM GNU Toolchain for ARM Linux (gnueabihf, 32-bit hard-float)"
+homepage: "https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain"
+license: "GPL-3.0"
+
+capabilities:
+  - toolchain.gcc
+  - target.arm-linux-gnueabihf
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/11.3.rel1/binrel/arm-gnu-toolchain-11.3.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz"
+        sha256: "3f76650b1d048036473b16b647b8fd005ffccd1a2869c10994967e0e49f26ac2"
+      linux/arm64:
+        url: "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/11.3.rel1/binrel/arm-gnu-toolchain-11.3.rel1-aarch64-arm-none-linux-gnueabihf.tar.xz"
+        sha256: "2a12d92fcb7aadb059f42b9f18396c5d22ef76624225a855f4c28fa7fd888654"
+
+install_hints:
+  creates: "bin/arm-none-linux-gnueabihf-gcc"
+  env_vars:
+    CROSS_COMPILE: "arm-none-linux-gnueabihf-"
+
+lifecycle:
+  status: deprecated
+  released_at: "2022-07-15"
+  replaced_by: "13.3.rel1"

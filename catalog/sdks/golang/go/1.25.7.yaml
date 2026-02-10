@@ -1,0 +1,33 @@
+spec_version: 1
+id: sdk.golang.go
+version: "1.25.7"
+
+name: "Go Programming Language"
+homepage: "https://go.dev"
+license: "BSD-3-Clause"
+
+capabilities:
+  - sdk.golang
+  - language.go
+  - compiler.go
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://go.dev/dl/go1.25.7.linux-amd64.tar.gz"
+        sha256: "12e6d6a191091ae27dc31f6efc630e3a3b8ba409baf3573d955b196fdf086005"
+      linux/arm64:
+        url: "https://go.dev/dl/go1.25.7.linux-arm64.tar.gz"
+        sha256: "ba611a53534135a81067240eff9508cd7e256c560edd5d8c2fef54f083c07129"
+
+install_hints:
+  creates: "go/bin/go"
+  env_vars:
+    GOROOT: "/usr/local/go"
+    PATH_ADD: "/usr/local/go/bin"
+
+lifecycle:
+  status: stable
+  released_at: "2026-01-29"

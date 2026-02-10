@@ -1,0 +1,40 @@
+spec_version: 1
+id: sdk.zephyr.zephyr-sdk
+version: "0.17.0"
+
+name: "Zephyr SDK"
+homepage: "https://github.com/zephyrproject-rtos/sdk-ng"
+license: "Apache-2.0"
+
+capabilities:
+  - sdk.zephyr
+  - target.rtos
+  - target.arm
+  - target.riscv
+  - target.x86
+  - target.xtensa
+  - target.arc
+  - target.mips
+  - target.sparc
+  - toolchain.gcc
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-x86_64.tar.xz"
+        sha256: "89d3ae1b22cf9a9a1c8cbe5a4a2ab7602a18dac5e588cf3e40cb9be6ed0aa890"
+      linux/arm64:
+        url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-aarch64.tar.xz"
+        sha256: "c4e2fd0a9ca6ebe45f9ee8f527c58ccbd6af5e62e52e8c8c89e6a3cdf3f6d52e"
+
+install_hints:
+  creates: "setup.sh"
+  env_vars:
+    ZEPHYR_SDK_INSTALL_DIR: "/opt/zephyr-sdk"
+    ZEPHYR_TOOLCHAIN_VARIANT: "zephyr"
+
+lifecycle:
+  status: stable
+  released_at: "2024-01-01"

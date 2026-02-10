@@ -1,0 +1,32 @@
+spec_version: 1
+id: tool.pengutronix.genimage
+version: "15"
+
+name: "genimage - Image Generation Tool"
+homepage: "https://github.com/pengutronix/genimage"
+license: "GPL-2.0"
+
+capabilities:
+  - tool.image-generation
+
+providers:
+  - id: source
+    method: source
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/pengutronix/genimage/releases/download/v15/genimage-15.tar.xz"
+        sha256: "9bca24bf883310b30ee4511cbc3a580e40ad4540826e5ed3992c595ce72d003e"
+      linux/arm64:
+        url: "https://github.com/pengutronix/genimage/releases/download/v15/genimage-15.tar.xz"
+        sha256: "9bca24bf883310b30ee4511cbc3a580e40ad4540826e5ed3992c595ce72d003e"
+
+install_hints:
+  creates: "/usr/bin/genimage"
+  build_deps:
+    - build-essential
+    - libconfuse-dev
+    - pkg-config
+
+lifecycle:
+  status: stable
+  released_at: "2023-01-01"

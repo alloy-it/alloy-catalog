@@ -1,0 +1,28 @@
+spec_version: 1
+id: sdk.flutter.flutter
+version: "3.38.9"
+
+name: "Flutter SDK"
+homepage: "https://flutter.dev"
+license: "BSD-3-Clause"
+
+capabilities:
+  - sdk.flutter
+  - language.dart
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.38.9-stable.tar.xz"
+        sha256: "cb39eeb717c7d7dce95736b862cada2fdedeebcbb0107c44a346659c77031003"
+
+install_hints:
+  creates: "bin/flutter"
+  env_vars:
+    PATH_ADD: "/usr/local/flutter/bin"
+
+lifecycle:
+  status: stable
+  released_at: "2026-01-29"

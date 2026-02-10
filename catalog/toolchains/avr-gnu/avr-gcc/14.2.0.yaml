@@ -1,0 +1,26 @@
+spec_version: 1
+id: toolchain.avr-gnu.avr-gcc
+version: "14.2.0"
+
+name: "AVR GNU Toolchain (AVR 8-bit GCC)"
+homepage: "https://github.com/modm-io/avr-gcc"
+license: "GPL-3.0"
+
+capabilities:
+  - toolchain.gcc
+  - target.avr
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/modm-io/avr-gcc/releases/download/v14.2.0/modm-avr-gcc.tar.bz2"
+        sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+install_hints:
+  creates: "bin/avr-gcc"
+
+lifecycle:
+  status: stable
+  released_at: "2025-04-18"

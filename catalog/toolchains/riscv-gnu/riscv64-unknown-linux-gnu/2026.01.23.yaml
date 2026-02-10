@@ -1,0 +1,28 @@
+spec_version: 1
+id: toolchain.riscv-gnu.riscv64-unknown-linux-gnu
+version: "2026.01.23"
+
+name: "RISC-V GNU Toolchain for 64-bit RISC-V Linux (glibc)"
+homepage: "https://github.com/riscv-collab/riscv-gnu-toolchain"
+license: "GPL-3.0"
+
+capabilities:
+  - toolchain.gcc
+  - target.riscv64-linux-gnu
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/2026.01.23/riscv64-glibc-ubuntu-22.04-gcc.tar.xz"
+        sha256: "d9eee395dc56a9ee2c61413bd71bbbef532585d6e7dbc479450a80fb9a3dc17a"
+
+install_hints:
+  creates: "bin/riscv64-unknown-linux-gnu-gcc"
+  env_vars:
+    CROSS_COMPILE: "riscv64-unknown-linux-gnu-"
+
+lifecycle:
+  status: stable
+  released_at: "2026-01-23"

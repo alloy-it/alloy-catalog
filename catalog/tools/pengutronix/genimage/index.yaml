@@ -1,0 +1,12 @@
+spec_version: 1
+id: tool.pengutronix.genimage
+type: index
+
+aliases:
+  latest: "15"
+  stable: "15"
+
+versions:
+  - version: "15"
+    file: "15.yaml"
+    status: stable

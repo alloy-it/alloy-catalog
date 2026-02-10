@@ -1,0 +1,10 @@
+spec_version: 1
+id: toolchain.avr-gnu.avr-gcc
+type: index
+aliases:
+    latest: 14.2.0
+    stable: 14.2.0
+versions:
+    - version: 14.2.0
+      file: 14.2.0.yaml
+      status: stable

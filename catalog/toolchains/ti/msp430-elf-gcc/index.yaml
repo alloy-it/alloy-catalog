@@ -1,0 +1,10 @@
+spec_version: 1
+id: toolchain.ti.msp430-elf-gcc
+type: index
+aliases:
+    latest: 9.3.1.11
+    stable: 9.3.1.11
+versions:
+    - version: 9.3.1.11
+      file: 9.3.1.11.yaml
+      status: stable

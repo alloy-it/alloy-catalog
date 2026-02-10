@@ -1,0 +1,10 @@
+spec_version: 1
+id: toolchain.espressif.xtensa-esp-elf
+type: index
+aliases:
+    latest: 15.2.0_20251204
+    stable: 15.2.0_20251204
+versions:
+    - version: 15.2.0_20251204
+      file: 15.2.0_20251204.yaml
+      status: stable
