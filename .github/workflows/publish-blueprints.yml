@@ -83,6 +83,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout alloy-cicd
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/alloy-cicd
+          path: alloy-cicd
+
       - uses: actions/setup-go@v5
         with:
           go-version: '1.25'
