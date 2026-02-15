@@ -11,18 +11,12 @@
 
 # --- 32-bit ARM Toolchain (armhf) for Raspberry Pi OS 32-bit ---
 - name: "Install Raspberry Pi 32-bit (armhf) toolchain"
-  action: "unarchive_from_url"
+  action: "unarchive_from_ref"
+  ref: "toolchain.arm-gnu.arm-none-linux-gnueabihf@stable"
   dest: "{{.Vars.TOOLCHAIN_32BIT_DEST}}"
   creates: "{{.Vars.TOOLCHAIN_32BIT_DEST}}/bin/arm-none-linux-gnueabihf-gcc"
   mode: "USER_RWX_GROUP_RX_OTHER_RX"
   owner: "root:root"
-  per_arch:
-    amd64:
-      url: "{{.Vars.TOOLCHAIN_32BIT_URL_amd64}}"
-      sha256: "{{.Vars.TOOLCHAIN_32BIT_SHA_amd64}}"
-    arm64:
-      url: "{{.Vars.TOOLCHAIN_32BIT_URL_arm64}}"
-      sha256: "{{.Vars.TOOLCHAIN_32BIT_SHA_arm64}}"
 
 - name: "Add 32-bit toolchain to PATH"
   action: "write_env_file"

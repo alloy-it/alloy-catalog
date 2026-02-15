@@ -11,18 +11,12 @@
 
 # --- 64-bit ARM Toolchain (aarch64) for Raspberry Pi OS 64-bit ---
 - name: "Install Raspberry Pi 64-bit (aarch64) toolchain"
-  action: "unarchive_from_url"
+  action: "unarchive_from_ref"
+  ref: "toolchain.arm-gnu.aarch64-none-linux-gnu@stable"
   dest: "{{.Vars.TOOLCHAIN_64BIT_DEST}}"
   creates: "{{.Vars.TOOLCHAIN_64BIT_DEST}}/bin/aarch64-none-linux-gnu-gcc"
   mode: "USER_RWX_GROUP_RX_OTHER_RX"
   owner: "root:root"
-  per_arch:
-    amd64:
-      url: "{{.Vars.TOOLCHAIN_64BIT_URL_amd64}}"
-      sha256: "{{.Vars.TOOLCHAIN_64BIT_SHA_amd64}}"
-    arm64:
-      url: "{{.Vars.TOOLCHAIN_64BIT_URL_arm64}}"
-      sha256: "{{.Vars.TOOLCHAIN_64BIT_SHA_arm64}}"
 
 - name: "Add 64-bit toolchain to PATH"
   action: "write_env_file"

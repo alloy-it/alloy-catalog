@@ -1,19 +1,13 @@
 #
 # 10-host-tools.yml
-# Installs host-side build tools: Go, libconfuse, and genimage.
+# Installs host-side build tools: Go (from catalog).
 #
 - name: "Install Go"
-  action: "unarchive_from_url"
+  action: "unarchive_from_ref"
+  ref: "sdk.golang.go@stable"
   dest: "/usr/local"
   creates: "/usr/local/go/bin/go"
   mode: "USER_RWX_GROUP_RX_OTHER_RX"
-  per_arch:
-    amd64:
-      url: "{{.Vars.GOLANG_URL_amd64}}"
-      sha256: "{{.Vars.GOLANG_SHA_amd64}}"
-    arm64:
-      url: "{{.Vars.GOLANG_URL_arm64}}"
-      sha256: "{{.Vars.GOLANG_SHA_arm64}}"
 
 - name: "Add Go to system PATH"
   action: "write_env_file"
