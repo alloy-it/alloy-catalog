@@ -1,0 +1,41 @@
+# Alloy Blueprint: nrf54
+#
+# This manifest defines a complete development environment for
+# Nordic Semiconductor nRF54 series (nRF54H20, nRF54L15, etc.) with
+# Cortex-M33. Includes the nRF Connect SDK, Zephyr RTOS, and all required tools.
+#
+name: "Nordic nRF54 Dev Environment"
+version: "1.0.0"
+description: "Provides the nRF Connect SDK, ARM toolchain, and development tools for nRF54 series."
+
+#==================================================================
+# Variables (paths and versions; URL/SHA come from catalog)
+#==================================================================
+variables:
+  ARM_TOOLCHAIN_DEST: "/opt/arm-none-eabi"
+  ZEPHYR_SDK_DEST: "/opt/zephyr-sdk"
+  NCS_VERSION: "v2.9.0"
+  NCS_BASE: "/opt/nordic/ncs"
+  NRF_TOOLS_DEST: "/opt/nrf-command-line-tools"
+
+#==================================================================
+# Toolchains (resolved via alloy-host resolve → alloy.lock.yml)
+#==================================================================
+toolchains:
+  - ref: "sdk.golang.go@stable"
+    alias: GOLANG
+  - ref: "toolchain.arm-gnu.arm-none-eabi@stable"
+    alias: ARM_TOOLCHAIN
+  - ref: "sdk.zephyr.zephyr-sdk@stable"
+    alias: ZEPHYR_SDK
+  - ref: "tool.nordic.nrf-command-line-tools@stable"
+    alias: NRF_TOOLS
+
+#==================================================================
+# Run Order
+#==================================================================
+run_order:
+  - "00-system-base.yml"
+  - "10-arm-toolchain.yml"
+  - "20-nrf-sdk.yml"
+  - "99-cleanup.yml"

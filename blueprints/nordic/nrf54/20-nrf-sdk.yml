@@ -1,0 +1,110 @@
+#
+# 20-nrf-sdk.yml
+# Installs nRF Connect SDK, West, and Nordic command line tools.
+#
+- name: "Create nRF Connect SDK directory"
+  action: "run_command"
+  command: |
+    mkdir -p {{.Vars.NCS_BASE}}
+    mkdir -p {{.Vars.NRF_TOOLS_DEST}}
+  creates: "{{.Vars.NCS_BASE}}"
+
+- name: "Install West and Python dependencies"
+  action: "run_command"
+  command: |
+    pip3 install --break-system-packages \
+      west \
+      pyelftools \
+      pyyaml \
+      pykwalify \
+      canopen \
+      packaging \
+      progress \
+      psutil \
+      anytree \
+      intelhex \
+      cryptography \
+      cbor2
+  creates: "/usr/local/bin/west"
+
+- name: "Add West environment"
+  action: "write_env_file"
+  file: "/etc/profile.d/20-west.sh"
+  content: |
+    #!/bin/sh
+    export ZEPHYR_BASE={{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+- name: "Initialize nRF Connect SDK with West"
+  action: "run_command"
+  command: |
+    set -e
+    cd {{.Vars.NCS_BASE}}
+    if [ ! -d "{{.Vars.NCS_VERSION}}" ]; then
+      west init -m https://github.com/nrfconnect/sdk-nrf --mr {{.Vars.NCS_VERSION}} {{.Vars.NCS_VERSION}}
+      cd {{.Vars.NCS_VERSION}}
+      west update
+      west zephyr-export
+    fi
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf"
+
+- name: "Install nRF Connect SDK Python requirements"
+  action: "run_command"
+  command: |
+    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
+    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
+    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
+
+- name: "Mark Python deps as installed"
+  action: "run_command"
+  command: "touch {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
+
+- name: "Install Nordic nRF Command Line Tools"
+  action: "unarchive_from_ref"
+  ref: "tool.nordic.nrf-command-line-tools@stable"
+  dest: "{{.Vars.NRF_TOOLS_DEST}}"
+  creates: "{{.Vars.NRF_TOOLS_DEST}}/bin/nrfjprog"
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+- name: "Add Nordic tools to PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/21-nrf-tools.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:{{.Vars.NRF_TOOLS_DEST}}/bin
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+- name: "Create CMake presets directory"
+  action: "run_command"
+  command: "mkdir -p /opt/nordic/cmake"
+  creates: "/opt/nordic/cmake"
+
+- name: "Create CMake toolchain file for nRF54H20"
+  action: "write_env_file"
+  file: "/opt/nordic/cmake/nrf54h20.cmake"
+  content: |
+    # CMake configuration for nRF54H20 with nRF Connect SDK
+    # Use with: cmake -DCMAKE_TOOLCHAIN_FILE=/opt/nordic/cmake/nrf54h20.cmake
+
+    set(BOARD nrf54h20dk_nrf54h20)
+    set(ZEPHYR_BASE {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr)
+    set(GNUARMEMB_TOOLCHAIN_PATH {{.Vars.ARM_TOOLCHAIN_DEST}})
+
+    list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/cmake)
+  mode: "USER_RW_GROUP_R_OTHER_R"
+
+- name: "Create CMake toolchain file for nRF54L15"
+  action: "write_env_file"
+  file: "/opt/nordic/cmake/nrf54l15.cmake"
+  content: |
+    # CMake configuration for nRF54L15 with nRF Connect SDK
+    # Use with: cmake -DCMAKE_TOOLCHAIN_FILE=/opt/nordic/cmake/nrf54l15.cmake
+
+    set(BOARD nrf54l15dk_nrf54l15)
+    set(ZEPHYR_BASE {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr)
+    set(GNUARMEMB_TOOLCHAIN_PATH {{.Vars.ARM_TOOLCHAIN_DEST}})
+
+    list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/cmake)
+  mode: "USER_RW_GROUP_R_OTHER_R"
