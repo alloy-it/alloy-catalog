@@ -1,0 +1,122 @@
+#
+# 20-nrf-sdk.yml
+# Installs nRF Connect SDK, West, and Nordic command line tools.
+#
+- name: "Create nRF Connect SDK directory"
+  action: "run_command"
+  command: |
+    mkdir -p {{.Vars.NCS_BASE}}
+    mkdir -p {{.Vars.NRF_TOOLS_DEST}}
+  creates: "{{.Vars.NCS_BASE}}"
+
+# --- Python dependencies and West ---
+- name: "Install West and Python dependencies"
+  action: "run_command"
+  command: |
+    pip3 install --break-system-packages \
+      west \
+      pyelftools \
+      pyyaml \
+      pykwalify \
+      canopen \
+      packaging \
+      progress \
+      psutil \
+      anytree \
+      intelhex \
+      cryptography \
+      cbor2
+  creates: "/usr/local/bin/west"
+
+- name: "Add West environment"
+  action: "write_env_file"
+  file: "/etc/profile.d/20-west.sh"
+  content: |
+    #!/bin/sh
+    export ZEPHYR_BASE={{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+# --- nRF Connect SDK ---
+- name: "Initialize nRF Connect SDK with West"
+  action: "run_command"
+  command: |
+    set -e
+    cd {{.Vars.NCS_BASE}}
+    if [ ! -d "{{.Vars.NCS_VERSION}}" ]; then
+      west init -m https://github.com/nrfconnect/sdk-nrf --mr {{.Vars.NCS_VERSION}} {{.Vars.NCS_VERSION}}
+      cd {{.Vars.NCS_VERSION}}
+      west update
+      west zephyr-export
+    fi
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf"
+
+- name: "Install nRF Connect SDK Python requirements"
+  action: "run_command"
+  command: |
+    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
+    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
+    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
+
+- name: "Mark Python deps as installed"
+  action: "run_command"
+  command: "touch {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
+
+# --- Nordic Command Line Tools ---
+- name: "Install Nordic nRF Command Line Tools"
+  action: "unarchive_from_url"
+  dest: "{{.Vars.NRF_TOOLS_DEST}}"
+  creates: "{{.Vars.NRF_TOOLS_DEST}}/bin/nrfjprog"
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  per_arch:
+    amd64:
+      url: "{{.Vars.NRF_TOOLS_URL_amd64}}"
+      sha256: "{{.Vars.NRF_TOOLS_SHA_amd64}}"
+    arm64:
+      url: "{{.Vars.NRF_TOOLS_URL_arm64}}"
+      sha256: "{{.Vars.NRF_TOOLS_SHA_arm64}}"
+
+- name: "Add Nordic tools to PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/21-nrf-tools.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:{{.Vars.NRF_TOOLS_DEST}}/bin
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+# --- CMake presets for nRF91 ---
+- name: "Create CMake presets directory"
+  action: "run_command"
+  command: "mkdir -p /opt/nordic/cmake"
+  creates: "/opt/nordic/cmake"
+
+- name: "Create CMake toolchain file for nRF9160"
+  action: "write_env_file"
+  file: "/opt/nordic/cmake/nrf9160.cmake"
+  content: |
+    # CMake configuration for nRF9160 with nRF Connect SDK
+    # Use with: cmake -DCMAKE_TOOLCHAIN_FILE=/opt/nordic/cmake/nrf9160.cmake
+
+    set(BOARD nrf9160dk_nrf9160_ns)
+    set(ZEPHYR_BASE {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr)
+    set(GNUARMEMB_TOOLCHAIN_PATH {{.Vars.ARM_TOOLCHAIN_DEST}})
+
+    # Include Zephyr's CMake configuration
+    list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/cmake)
+  mode: "USER_RW_GROUP_R_OTHER_R"
+
+- name: "Create CMake toolchain file for nRF9161"
+  action: "write_env_file"
+  file: "/opt/nordic/cmake/nrf9161.cmake"
+  content: |
+    # CMake configuration for nRF9161 with nRF Connect SDK
+    # Use with: cmake -DCMAKE_TOOLCHAIN_FILE=/opt/nordic/cmake/nrf9161.cmake
+
+    set(BOARD nrf9161dk_nrf9161_ns)
+    set(ZEPHYR_BASE {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr)
+    set(GNUARMEMB_TOOLCHAIN_PATH {{.Vars.ARM_TOOLCHAIN_DEST}})
+
+    # Include Zephyr's CMake configuration
+    list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/cmake)
+  mode: "USER_RW_GROUP_R_OTHER_R"

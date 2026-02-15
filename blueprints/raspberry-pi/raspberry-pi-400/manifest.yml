@@ -1,0 +1,51 @@
+# Alloy Blueprint: raspberry-pi
+#
+# This manifest defines a complete development environment for
+# Raspberry Pi 400 (64-bit). It provides cross-compilation
+# toolchains, build tools, and development utilities.
+#
+name: "Raspberry Pi 400 Dev Environment"
+version: "1.0.0"
+description: "Provides cross-compilation toolchains and development tools for Raspberry Pi 400 (64-bit)."
+
+#==================================================================
+# Variables
+# These are used by all other blueprint files.
+#==================================================================
+variables:
+  # --- Go Language ---
+  GOLANG_VERSION: "1.24.4"
+  GOLANG_URL_amd64: "https://go.dev/dl/go1.24.4.linux-amd64.tar.gz"
+  GOLANG_SHA_amd64: "77e5da33bb72aeaef1ba4418b6fe511bc4d041873cbf82e5aa6318740df98717"
+  GOLANG_URL_arm64: "https://go.dev/dl/go1.24.4.linux-arm64.tar.gz"
+  GOLANG_SHA_arm64: "d5501ee5aca0f258d5fe9bfaed401958445014495dc115f202d43d5210b45241"
+
+  # --- Cross-Compilation Toolchains ---
+  # Raspberry Pi 64-bit (aarch64) toolchain - Arm GNU Toolchain 13.3
+  TOOLCHAIN_64BIT_DEST: "/opt/cross-pi/aarch64-linux-gnu"
+  TOOLCHAIN_64BIT_URL_amd64: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+  TOOLCHAIN_64BIT_SHA_amd64: "f0d87abe3dcc24797823f41a8c4eef0c8a76e82ab6ce30f43dc5f97c4b2b1b46"
+  TOOLCHAIN_64BIT_URL_arm64: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
+  TOOLCHAIN_64BIT_SHA_arm64: "b3a7f1e88bf36fc7bb6cedd5d62a0e3e8a0eb2d30b61cdad7bcea02f7a303a94"
+  TOOLCHAIN_64BIT_FOLDER: "arm-gnu-toolchain-13.3.rel1"
+
+  # --- CMake Toolchain Files ---
+  TOOLCHAIN_FILES_DIR: "/opt/cross-pi/cmake"
+  SYSROOT_URL: "https://example.com/sysroot.tar.xz"
+  SYSROOT_DIR: "/opt/cross-pi/sysroot"
+
+
+#==================================================================
+# Toolchains (resolved via alloy-host resolve → alloy.lock.yml)
+#==================================================================
+toolchains:
+
+#==================================================================
+# Run Order
+#==================================================================
+run_order:
+  - "00-system-base.yml"
+  - "10-host-tools.yml"
+  - "20-toolchain.yml"
+  - "30-sysroot.yml"
+  - "99-cleanup.yml"

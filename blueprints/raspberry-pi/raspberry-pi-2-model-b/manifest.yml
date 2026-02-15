@@ -1,0 +1,51 @@
+# Alloy Blueprint: raspberry-pi
+#
+# This manifest defines a complete development environment for
+# Raspberry Pi 2 Model B (32-bit). It provides cross-compilation
+# toolchains, build tools, and development utilities.
+#
+name: "Raspberry Pi 2 Model B Dev Environment"
+version: "1.0.0"
+description: "Provides cross-compilation toolchains and development tools for Raspberry Pi 2 Model B (32-bit)."
+
+#==================================================================
+# Variables
+# These are used by all other blueprint files.
+#==================================================================
+variables:
+  # --- Go Language ---
+  GOLANG_VERSION: "1.24.4"
+  GOLANG_URL_amd64: "https://go.dev/dl/go1.24.4.linux-amd64.tar.gz"
+  GOLANG_SHA_amd64: "77e5da33bb72aeaef1ba4418b6fe511bc4d041873cbf82e5aa6318740df98717"
+  GOLANG_URL_arm64: "https://go.dev/dl/go1.24.4.linux-arm64.tar.gz"
+  GOLANG_SHA_arm64: "d5501ee5aca0f258d5fe9bfaed401958445014495dc115f202d43d5210b45241"
+
+  # --- Cross-Compilation Toolchains ---
+  # Raspberry Pi 32-bit (armhf) toolchain - Arm GNU Toolchain 13.3
+  TOOLCHAIN_32BIT_DEST: "/opt/cross-pi/arm-linux-gnueabihf"
+  TOOLCHAIN_32BIT_URL_amd64: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz"
+  TOOLCHAIN_32BIT_SHA_amd64: "95c011cee430e64dd6087c75c800f04b9c49832cc1000b8e4a59717aa8648d9f"
+  TOOLCHAIN_32BIT_URL_arm64: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-aarch64-arm-none-linux-gnueabihf.tar.xz"
+  TOOLCHAIN_32BIT_SHA_arm64: "b55ae32544d274665e9844029c28f8b8bc00fdbb2d56ba6d90a4f95ca721dca4"
+  TOOLCHAIN_32BIT_FOLDER: "arm-gnu-toolchain-13.3.rel1"
+
+  # --- CMake Toolchain Files ---
+  TOOLCHAIN_FILES_DIR: "/opt/cross-pi/cmake"
+  SYSROOT_URL: "https://example.com/sysroot.tar.xz"
+  SYSROOT_DIR: "/opt/cross-pi/sysroot"
+
+
+#==================================================================
+# Toolchains (resolved via alloy-host resolve → alloy.lock.yml)
+#==================================================================
+toolchains:
+
+#==================================================================
+# Run Order
+#==================================================================
+run_order:
+  - "00-system-base.yml"
+  - "10-host-tools.yml"
+  - "20-toolchain.yml"
+  - "30-sysroot.yml"
+  - "99-cleanup.yml"

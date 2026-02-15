@@ -1,0 +1,52 @@
+#
+# 20-toolchain.yml
+# Installs ARM cross-compilation toolchains for Raspberry Pi (64-bit).
+#
+- name: "Create cross-compiler destination directories"
+  action: "run_command"
+  command: |
+    mkdir -p {{.Vars.TOOLCHAIN_64BIT_DEST}}
+    mkdir -p {{.Vars.TOOLCHAIN_FILES_DIR}}
+  creates: "{{.Vars.TOOLCHAIN_FILES_DIR}}"
+
+# --- 64-bit ARM Toolchain (aarch64) for Raspberry Pi OS 64-bit ---
+- name: "Install Raspberry Pi 64-bit (aarch64) toolchain"
+  action: "unarchive_from_url"
+  dest: "{{.Vars.TOOLCHAIN_64BIT_DEST}}"
+  creates: "{{.Vars.TOOLCHAIN_64BIT_DEST}}/bin/aarch64-none-linux-gnu-gcc"
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  owner: "root:root"
+  per_arch:
+    amd64:
+      url: "{{.Vars.TOOLCHAIN_64BIT_URL_amd64}}"
+      sha256: "{{.Vars.TOOLCHAIN_64BIT_SHA_amd64}}"
+    arm64:
+      url: "{{.Vars.TOOLCHAIN_64BIT_URL_arm64}}"
+      sha256: "{{.Vars.TOOLCHAIN_64BIT_SHA_arm64}}"
+
+- name: "Add 64-bit toolchain to PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/21-raspi-toolchain-64.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:{{.Vars.TOOLCHAIN_64BIT_DEST}}/bin
+    export CROSS_COMPILE_64=aarch64-none-linux-gnu-
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+# --- CMake Toolchain Files ---
+- name: "Create CMake toolchain file for 64-bit Raspberry Pi"
+  action: "write_env_file"
+  file: "{{.Vars.TOOLCHAIN_FILES_DIR}}/raspi-64bit.cmake"
+  content: |
+    # CMake Toolchain File for Raspberry Pi 64-bit (aarch64)
+    set(CMAKE_SYSTEM_NAME Linux)
+    set(CMAKE_SYSTEM_PROCESSOR aarch64)
+
+    set(TOOLCHAIN_PREFIX aarch64-none-linux-gnu)
+    set(TOOLCHAIN_PATH {{.Vars.TOOLCHAIN_64BIT_DEST}})
+
+    set(CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-g++)
+    set(CMAKE_SYSROOT {{.Vars.SYSROOT_DIR}})
+
+    set(CMAKE_FIND_ROOT_PATH ${TOOLCHAIN_PATH}/${TOOLCHAIN_PREFIX})

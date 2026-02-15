@@ -1,0 +1,9 @@
+#
+# 30-sysroot.yml
+# Installs the Raspberry Pi sysroot.
+#
+- name: "Install Raspberry Pi Sysroot"
+  action: "unarchive_from_url"
+  dest: "{{.Vars.SYSROOT_DIR}}"
+  creates: "{{.Vars.SYSROOT_DIR}}/usr/lib"
+  url: "{{.Vars.SYSROOT_URL}}"

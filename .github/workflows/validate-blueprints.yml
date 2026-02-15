@@ -1,0 +1,96 @@
+# Validate blueprints on pull requests
+#
+# Runs validation and resolution (dry-run) for any blueprint
+# modified in the PR, catching errors before merge.
+#
+# Directory layout: blueprints/<vendor>/<board>/manifest.yml
+
+name: Validate Blueprints
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'blueprints/**'
+
+permissions:
+  contents: read
+
+jobs:
+  detect-changes:
+    name: Detect changed blueprints
+    runs-on: ubuntu-latest
+    outputs:
+      blueprints: ${{ steps.changes.outputs.blueprints }}
+      has_changes: ${{ steps.changes.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find changed blueprints
+        id: changes
+        run: |
+          # Extract unique vendor/board pairs from changed files
+          CHANGED=$(git diff --name-only origin/main...HEAD -- 'blueprints/' | \
+            awk -F'/' 'NF>=4 {print $2"/"$3}' | sort -u || true)
+
+          if [ -z "$CHANGED" ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "blueprints=[]" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          VALID=()
+          for bp in $CHANGED; do
+            if [ -f "blueprints/${bp}/manifest.yml" ]; then
+              VALID+=("\"${bp}\"")
+              echo "  Changed: ${bp}"
+            fi
+          done
+
+          if [ ${#VALID[@]} -eq 0 ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "blueprints=[]" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          JSON="[$(IFS=,; echo "${VALID[*]}")]"
+          echo "blueprints=${JSON}" >> "$GITHUB_OUTPUT"
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+  validate:
+    name: Validate ${{ matrix.blueprint }}
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        blueprint: ${{ fromJson(needs.detect-changes.outputs.blueprints) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+          cache-dependency-path: 'alloy-cicd/go.sum'
+
+      - name: Build alloy-cicd
+        run: |
+          cd alloy-cicd
+          go build -o ../alloy-cicd-bin ./cmd/alloy-cicd
+
+      - name: Validate
+        run: ./alloy-cicd-bin validate --dir "blueprints/${{ matrix.blueprint }}"
+
+      - name: Resolve (dry-run)
+        run: |
+          ./alloy-cicd-bin resolve \
+            --dir "blueprints/${{ matrix.blueprint }}" \
+            --catalog-dir . \
+            --host-platform linux/amd64
+
+      - name: Show resolved lockfile
+        run: cat "blueprints/${{ matrix.blueprint }}/alloy.lock.yml" 2>/dev/null || echo "No lockfile (no toolchain refs)"

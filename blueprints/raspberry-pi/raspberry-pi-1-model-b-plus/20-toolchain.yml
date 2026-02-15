@@ -1,0 +1,60 @@
+#
+# 20-toolchain.yml
+# Installs ARM cross-compilation toolchains for Raspberry Pi (32-bit).
+#
+- name: "Create cross-compiler destination directories"
+  action: "run_command"
+  command: |
+    mkdir -p {{.Vars.TOOLCHAIN_32BIT_DEST}}
+    mkdir -p {{.Vars.TOOLCHAIN_FILES_DIR}}
+  creates: "{{.Vars.TOOLCHAIN_FILES_DIR}}"
+
+# --- 32-bit ARM Toolchain (armhf) for Raspberry Pi OS 32-bit ---
+- name: "Install Raspberry Pi 32-bit (armhf) toolchain"
+  action: "unarchive_from_url"
+  dest: "{{.Vars.TOOLCHAIN_32BIT_DEST}}"
+  creates: "{{.Vars.TOOLCHAIN_32BIT_DEST}}/bin/arm-none-linux-gnueabihf-gcc"
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  owner: "root:root"
+  per_arch:
+    amd64:
+      url: "{{.Vars.TOOLCHAIN_32BIT_URL_amd64}}"
+      sha256: "{{.Vars.TOOLCHAIN_32BIT_SHA_amd64}}"
+    arm64:
+      url: "{{.Vars.TOOLCHAIN_32BIT_URL_arm64}}"
+      sha256: "{{.Vars.TOOLCHAIN_32BIT_SHA_arm64}}"
+
+- name: "Add 32-bit toolchain to PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/20-raspi-toolchain-32.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:{{.Vars.TOOLCHAIN_32BIT_DEST}}/bin
+    export CROSS_COMPILE_32=arm-none-linux-gnueabihf-
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+# --- CMake Toolchain Files ---
+- name: "Create CMake toolchain file for 32-bit Raspberry Pi"
+  action: "write_env_file"
+  file: "{{.Vars.TOOLCHAIN_FILES_DIR}}/raspi-32bit.cmake"
+  content: |
+    # CMake Toolchain File for Raspberry Pi 32-bit (armhf)
+    set(CMAKE_SYSTEM_NAME Linux)
+    set(CMAKE_SYSTEM_PROCESSOR arm)
+
+    set(TOOLCHAIN_PREFIX arm-none-linux-gnueabihf)
+    set(TOOLCHAIN_PATH {{.Vars.TOOLCHAIN_32BIT_DEST}})
+
+    set(CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-g++)
+    set(CMAKE_SYSROOT {{.Vars.SYSROOT_DIR}})
+
+    set(CMAKE_FIND_ROOT_PATH ${TOOLCHAIN_PATH}/${TOOLCHAIN_PREFIX})
+    set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard" CACHE STRING "" FORCE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard" CACHE STRING "" FORCE)
+  mode: "USER_RW_GROUP_R_OTHER_R"

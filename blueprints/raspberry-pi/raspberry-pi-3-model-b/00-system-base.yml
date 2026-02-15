@@ -1,0 +1,90 @@
+#
+# 00-system-base.yml
+# Installs all base packages and sets up the system for Raspberry Pi development.
+#
+- name: "Update APT cache"
+  action: "run_command"
+  command: "apt-get update -y"
+
+- name: "Install Basic Tools"
+  action: "apt_install"
+  packages:
+    - "git"
+    - "unzip"
+    - "build-essential"
+    - "cmake"
+    - "sudo"
+    - "wget"
+    - "curl"
+    - "xz-utils"
+    - "file"
+    - "ca-certificates"
+    - "gnupg"
+    - "python3-pip"
+
+- name: "Install Raspberry Pi Dev Requirements"
+  action: "apt_install"
+  packages:
+    - "jq"
+    - "autoconf"
+    - "automake"
+    - "libtool"
+    - "gcc"
+    - "g++"
+    - "make"
+    - "pkg-config"
+    - "libncurses5-dev"
+    - "libssl-dev"
+    - "bison"
+    - "flex"
+    - "bc"
+    - "device-tree-compiler"
+    - "u-boot-tools"
+    - "fdisk"
+    - "kpartx"
+    - "e2fsprogs"
+    - "util-linux"
+    - "dosfstools"
+    - "parted"
+
+- name: "Install QEMU for ARM emulation"
+  action: "apt_install"
+  packages:
+    - "qemu"
+    - "qemu-user-static"
+    - "binfmt-support"
+
+- name: "Allow passwordless sudo for sudo group"
+  action: "run_command"
+  command: "echo '%sudo	ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
+  creates: "/etc/sudoers.d/raspi-dev-sudoers"
+
+- name: "Ensure binfmt service is running"
+  action: "run_command"
+  command: "service binfmt-support start"
+
+- name: "Register QEMU arm binfmt"
+  action: "run_command"
+  command: |
+    update-binfmts --install arm /usr/bin/qemu-arm-static \
+      --magic $'\x7fELF\x01\x01\x01' \
+      --mask $'\xff\xff\xff\xff\xff\xff\xff' \
+      --offset 0 \
+      --package qemu-user-static \
+      --credential yes \
+      --preserve yes \
+      --fix-binary yes
+  creates: "/var/lib/binfmts/qemu-arm-static"
+
+- name: "Register QEMU aarch64 binfmt"
+  action: "run_command"
+  command: |
+    update-binfmts --install aarch64 /usr/bin/qemu-aarch64-static \
+      --magic $'\x7fELF\x02\x01\x01' \
+      --mask $'\xff\xff\xff\xff\xff\xff\xff' \
+      --offset 0 \
+      --package qemu-user-static \
+      --credential yes \
+      --preserve yes \
+      --fix-binary yes
+  creates: "/var/lib/binfmts/qemu-aarch64-static"

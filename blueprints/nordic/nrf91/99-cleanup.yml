@@ -1,0 +1,46 @@
+#
+# 99-cleanup.yml
+# Final cleanup tasks and environment verification.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Clean pip cache"
+  action: "run_command"
+  command: "pip3 cache purge || true"
+
+- name: "Print installed tool versions"
+  action: "run_command"
+  command: |
+    echo "=== Nordic nRF91 Dev Environment Setup Complete ==="
+    echo ""
+    echo "ARM GNU Embedded Toolchain:"
+    {{.Vars.ARM_TOOLCHAIN_DEST}}/bin/arm-none-eabi-gcc --version | head -1
+    echo ""
+    echo "West version:"
+    west --version
+    echo ""
+    echo "Go version:"
+    /usr/local/go/bin/go version
+    echo ""
+    echo "CMake version:"
+    cmake --version | head -1
+    echo ""
+    echo "Ninja version:"
+    ninja --version
+    echo ""
+    echo "nRF Connect SDK:"
+    echo "  Location: {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
+    echo "  Version: {{.Vars.NCS_VERSION}}"
+    echo ""
+    echo "CMake toolchain files:"
+    ls -la /opt/nordic/cmake/*.cmake 2>/dev/null || echo "  No toolchain files found"
+    echo ""
+    echo "=== Ready for nRF91 development! ==="
+    echo ""
+    echo "Quick Start:"
+    echo "  cd {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
+    echo "  west build -b nrf9160dk_nrf9160_ns nrf/samples/cellular/hello_world"

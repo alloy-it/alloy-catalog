@@ -1,0 +1,25 @@
+#
+# 99-cleanup.yml
+# Final cleanup tasks to reduce VM size and tidy up.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Print installed toolchain versions"
+  action: "run_command"
+  command: |
+    echo "=== Raspberry Pi Dev Environment Setup Complete ==="
+    echo ""
+    echo "Go version:"
+    /usr/local/go/bin/go version
+    echo ""
+    echo "32-bit ARM toolchain (armhf):"
+    {{.Vars.TOOLCHAIN_32BIT_DEST}}/bin/arm-none-linux-gnueabihf-gcc --version | head -1
+    echo ""
+    echo "CMake toolchain files:"
+    ls -la {{.Vars.TOOLCHAIN_FILES_DIR}}/*.cmake
+    echo ""
+    echo "=== Ready for Raspberry Pi development! ==="

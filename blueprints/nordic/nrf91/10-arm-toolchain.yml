@@ -1,0 +1,86 @@
+#
+# 10-arm-toolchain.yml
+# Installs ARM GNU Embedded Toolchain and Go for nRF91 development.
+#
+- name: "Create toolchain directories"
+  action: "run_command"
+  command: |
+    mkdir -p {{.Vars.ARM_TOOLCHAIN_DEST}}
+    mkdir -p {{.Vars.ZEPHYR_SDK_DEST}}
+  creates: "{{.Vars.ARM_TOOLCHAIN_DEST}}"
+
+# --- ARM GNU Embedded Toolchain (arm-none-eabi) ---
+- name: "Install ARM GNU Embedded Toolchain"
+  action: "unarchive_from_url"
+  dest: "{{.Vars.ARM_TOOLCHAIN_DEST}}"
+  creates: "{{.Vars.ARM_TOOLCHAIN_DEST}}/bin/arm-none-eabi-gcc"
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  owner: "root:root"
+  per_arch:
+    amd64:
+      url: "{{.Vars.ARM_TOOLCHAIN_URL_amd64}}"
+      sha256: "{{.Vars.ARM_TOOLCHAIN_SHA_amd64}}"
+    arm64:
+      url: "{{.Vars.ARM_TOOLCHAIN_URL_arm64}}"
+      sha256: "{{.Vars.ARM_TOOLCHAIN_SHA_arm64}}"
+
+- name: "Add ARM toolchain to PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/10-arm-toolchain.sh"
+  content: |
+    #!/bin/sh
+    export GNUARMEMB_TOOLCHAIN_PATH={{.Vars.ARM_TOOLCHAIN_DEST}}
+    export PATH=$PATH:{{.Vars.ARM_TOOLCHAIN_DEST}}/bin
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+# --- Zephyr SDK (minimal - for host tools) ---
+- name: "Install Zephyr SDK (minimal)"
+  action: "unarchive_from_url"
+  dest: "{{.Vars.ZEPHYR_SDK_DEST}}"
+  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/setup.sh"
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  per_arch:
+    amd64:
+      url: "{{.Vars.ZEPHYR_SDK_URL_amd64}}"
+      sha256: "{{.Vars.ZEPHYR_SDK_SHA_amd64}}"
+    arm64:
+      url: "{{.Vars.ZEPHYR_SDK_URL_arm64}}"
+      sha256: "{{.Vars.ZEPHYR_SDK_SHA_arm64}}"
+
+- name: "Run Zephyr SDK setup"
+  action: "run_command"
+  command: |
+    cd {{.Vars.ZEPHYR_SDK_DEST}} && ./setup.sh -t arm-zephyr-eabi -h -c
+  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/.setup_complete"
+
+- name: "Add Zephyr SDK to environment"
+  action: "write_env_file"
+  file: "/etc/profile.d/11-zephyr-sdk.sh"
+  content: |
+    #!/bin/sh
+    export ZEPHYR_SDK_INSTALL_DIR={{.Vars.ZEPHYR_SDK_DEST}}
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+
+# --- Go Language ---
+- name: "Install Go"
+  action: "unarchive_from_url"
+  dest: "/usr/local"
+  creates: "/usr/local/go/bin/go"
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  per_arch:
+    amd64:
+      url: "{{.Vars.GOLANG_URL_amd64}}"
+      sha256: "{{.Vars.GOLANG_SHA_amd64}}"
+    arm64:
+      url: "{{.Vars.GOLANG_URL_arm64}}"
+      sha256: "{{.Vars.GOLANG_SHA_arm64}}"
+
+- name: "Add Go to system PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/12-golang.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:/usr/local/go/bin
+    export GOPATH=$HOME/go
+    export PATH=$PATH:$GOPATH/bin
+  mode: "USER_RWX_GROUP_RX_OTHER_RX"
