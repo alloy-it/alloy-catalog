@@ -75,6 +75,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository_owner }}/alloy-cicd
+          token: ${{ secrets.ALLOY_CICD_TOKEN }}
           path: alloy-cicd
 
       - uses: actions/setup-go@v5
