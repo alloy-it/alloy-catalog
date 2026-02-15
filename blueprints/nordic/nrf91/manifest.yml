@@ -9,44 +9,27 @@ version: "1.0.0"
 description: "Provides the nRF Connect SDK, ARM toolchain, and development tools for nRF91 series."
 
 #==================================================================
-# Variables
+# Variables (paths and versions; URL/SHA come from catalog)
 #==================================================================
 variables:
-  # --- ARM GNU Embedded Toolchain (arm-none-eabi) ---
-  # Version 13.3 for Cortex-M33 support (nRF91 series)
-  ARM_TOOLCHAIN_VERSION: "13.3.rel1"
   ARM_TOOLCHAIN_DEST: "/opt/arm-none-eabi"
-  ARM_TOOLCHAIN_URL_amd64: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi.tar.xz"
-  ARM_TOOLCHAIN_SHA_amd64: "95c011cee430e64dd6087c75c800f04b9c49832cc1000b8e4a59717aa8648d9f"
-  ARM_TOOLCHAIN_URL_arm64: "https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-aarch64-arm-none-eabi.tar.xz"
-  ARM_TOOLCHAIN_SHA_arm64: "c8824bffd057afce2259f7618254e840715f33523a3d4e4294f471208f976764"
-
-  # --- Nordic nRF Command Line Tools ---
-  NRF_TOOLS_VERSION: "10.24.2"
-  NRF_TOOLS_DEST: "/opt/nrf-command-line-tools"
-  NRF_TOOLS_URL_amd64: "https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x/10-24-2/nrf-command-line-tools-10.24.2_linux-amd64.tar.gz"
-  NRF_TOOLS_SHA_amd64: "7f03cb7e20ed17a1ae7bfa3d9e6f3c8a689b1d0e8f2c3a4b5d6e7f8a9b0c1d2e"
-  NRF_TOOLS_URL_arm64: "https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x/10-24-2/nrf-command-line-tools-10.24.2_linux-arm64.tar.gz"
-  NRF_TOOLS_SHA_arm64: "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"
-
-  # --- nRF Connect SDK ---
+  ZEPHYR_SDK_DEST: "/opt/zephyr-sdk"
   NCS_VERSION: "v2.9.0"
   NCS_BASE: "/opt/nordic/ncs"
+  NRF_TOOLS_DEST: "/opt/nrf-command-line-tools"
 
-  # --- Zephyr SDK (for additional tools) ---
-  ZEPHYR_SDK_VERSION: "0.17.0"
-  ZEPHYR_SDK_DEST: "/opt/zephyr-sdk"
-  ZEPHYR_SDK_URL_amd64: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-x86_64_minimal.tar.xz"
-  ZEPHYR_SDK_SHA_amd64: "2ebb94c76a6091c7f05bd5f47dc0e83fe2c96d1a5a86f2a9c2d9f3b4a5c6d7e8"
-  ZEPHYR_SDK_URL_arm64: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-aarch64_minimal.tar.xz"
-  ZEPHYR_SDK_SHA_arm64: "3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4"
-
-  # --- Go Language ---
-  GOLANG_VERSION: "1.24.4"
-  GOLANG_URL_amd64: "https://go.dev/dl/go1.24.4.linux-amd64.tar.gz"
-  GOLANG_SHA_amd64: "77e5da33bb72aeaef1ba4418b6fe511bc4d041873cbf82e5aa6318740df98717"
-  GOLANG_URL_arm64: "https://go.dev/dl/go1.24.4.linux-arm64.tar.gz"
-  GOLANG_SHA_arm64: "d5501ee5aca0f258d5fe9bfaed401958445014495dc115f202d43d5210b45241"
+#==================================================================
+# Toolchains (resolved via alloy-host resolve → alloy.lock.yml)
+#==================================================================
+toolchains:
+  - ref: "sdk.golang.go@stable"
+    alias: GOLANG
+  - ref: "toolchain.arm-gnu.arm-none-eabi@stable"
+    alias: ARM_TOOLCHAIN
+  - ref: "sdk.zephyr.zephyr-sdk@stable"
+    alias: ZEPHYR_SDK
+  - ref: "tool.nordic.nrf-command-line-tools@stable"
+    alias: NRF_TOOLS
 
 #==================================================================
 # Run Order

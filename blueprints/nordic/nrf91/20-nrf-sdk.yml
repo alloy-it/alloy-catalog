@@ -65,17 +65,11 @@
 
 # --- Nordic Command Line Tools ---
 - name: "Install Nordic nRF Command Line Tools"
-  action: "unarchive_from_url"
+  action: "unarchive_from_ref"
+  ref: "tool.nordic.nrf-command-line-tools@stable"
   dest: "{{.Vars.NRF_TOOLS_DEST}}"
   creates: "{{.Vars.NRF_TOOLS_DEST}}/bin/nrfjprog"
   mode: "USER_RWX_GROUP_RX_OTHER_RX"
-  per_arch:
-    amd64:
-      url: "{{.Vars.NRF_TOOLS_URL_amd64}}"
-      sha256: "{{.Vars.NRF_TOOLS_SHA_amd64}}"
-    arm64:
-      url: "{{.Vars.NRF_TOOLS_URL_arm64}}"
-      sha256: "{{.Vars.NRF_TOOLS_SHA_arm64}}"
 
 - name: "Add Nordic tools to PATH"
   action: "write_env_file"
