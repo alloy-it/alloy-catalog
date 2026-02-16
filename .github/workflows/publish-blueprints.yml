@@ -1,8 +1,10 @@
 # Publish changed blueprints images to Alloy Registry
 #
 # Triggered when blueprints are modified on the main branch.
-# Detects which blueprints changed (vendor/board pairs), then
-# validates, resolves, packs, and pushes each one.
+# Detects which vendor/board blueprints changed, then runs the full
+# alloy-cicd pipeline per blueprint: validate, resolve per manifest target
+# (e.g. linux/amd64, linux/arm64), pack per target, and push a multi-arch
+# image index so clients can pull by platform.
 #
 # Directory layout: blueprints/<vendor>/<board>/manifest.yml
 # Alloy image path:   api.alloy-it.io/community/<vendor>/<board>:<version>
@@ -140,18 +142,7 @@ jobs:
           echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
           echo "Blueprint: ${NAME} v${VERSION} (${{ matrix.blueprint }})"
 
-      - name: Validate
-        run: ./alloy-cicd-bin validate --dir "blueprints/${{ matrix.blueprint }}" --log-json
-
-      - name: Resolve catalog references
-        run: |
-          ./alloy-cicd-bin resolve \
-            --dir "blueprints/${{ matrix.blueprint }}" \
-            --catalog-dir . \
-            --host-platform linux/amd64 \
-            --log-json
-
-      - name: Push to registry
+      - name: Run pipeline (multi-arch)
         env:
           ALLOY_REGISTRY_USERNAME: ${{ secrets.ALLOY_REGISTRY_USERNAME }}
           ALLOY_REGISTRY_PASSWORD: ${{ secrets.ALLOY_REGISTRY_PASSWORD }}
@@ -159,19 +150,30 @@ jobs:
           VERSION="${{ steps.meta.outputs.version }}"
           SHORT_SHA="${{ steps.meta.outputs.short_sha }}"
 
-          # Push with version tag
-          # e.g., api.alloy-it.io/community/nordic/nrf91:1.0.0
-          ./alloy-cicd-bin push \
-            --dir "blueprints/${{ matrix.blueprint }}" \
+          # Pipeline: validate, resolve per manifest target (linux/amd64, linux/arm64),
+          # pack per target, push multi-arch index. Uses manifest "targets:" not runner OS/arch.
+          ./alloy-cicd-bin pipeline \
+            --repo . \
+            --blueprint "blueprints/${{ matrix.blueprint }}" \
+            --catalog-repo . \
             --registry "${{ env.REGISTRY }}" \
             --repository "${{ env.PROJECT }}/${{ matrix.blueprint }}" \
             --tag "${VERSION}" \
             --log-json
 
-          # Push with version+sha tag for traceability
-          # e.g., api.alloy-it.io/community/nordic/nrf91:1.0.0-abc1234
-          ./alloy-cicd-bin push \
-            --dir "blueprints/${{ matrix.blueprint }}" \
+      - name: Push version+sha tag (traceability)
+        env:
+          ALLOY_REGISTRY_USERNAME: ${{ secrets.ALLOY_REGISTRY_USERNAME }}
+          ALLOY_REGISTRY_PASSWORD: ${{ secrets.ALLOY_REGISTRY_PASSWORD }}
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          SHORT_SHA="${{ steps.meta.outputs.short_sha }}"
+
+          # Push same multi-arch image under version-sha tag (e.g. 1.0.0-abc1234)
+          ./alloy-cicd-bin pipeline \
+            --repo . \
+            --blueprint "blueprints/${{ matrix.blueprint }}" \
+            --catalog-repo . \
             --registry "${{ env.REGISTRY }}" \
             --repository "${{ env.PROJECT }}/${{ matrix.blueprint }}" \
             --tag "${VERSION}-${SHORT_SHA}" \
