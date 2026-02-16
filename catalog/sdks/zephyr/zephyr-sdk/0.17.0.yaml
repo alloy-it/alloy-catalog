@@ -27,7 +27,7 @@ providers:
         sha256: "89d3ae1b22cf9a9a1c8cbe5a4a2ab7602a18dac5e588cf3e40cb9be6ed0aa890"
       linux/arm64:
         url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-aarch64.tar.xz"
-        sha256: "c4e2fd0a9ca6ebe45f9ee8f527c58ccbd6af5e62e52e8c8c89e6a3cdf3f6d52e"
+        sha256: "d822b4336d5a66ad70077321cde92ca3580b235fd23326cd4fb00bdc16784483"
 
 install_hints:
   creates: "setup.sh"
