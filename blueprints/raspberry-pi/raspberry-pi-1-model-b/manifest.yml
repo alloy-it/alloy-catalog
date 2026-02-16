@@ -20,6 +20,13 @@ variables:
   SYSROOT_DIR: "/opt/cross-pi/sysroot"
 
 #==================================================================
+# Targets: OS/arch platforms this blueprint is built for (CI/CD creates one image per target).
+#==================================================================
+targets:
+  - linux/amd64
+  - linux/arm64
+
+#==================================================================
 # Toolchains (resolved via alloy-host resolve → alloy.lock.yml)
 #==================================================================
 toolchains:

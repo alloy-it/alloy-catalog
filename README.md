@@ -276,6 +276,11 @@ variables:
   GOLANG_SHA_arm64: "d5501ee5aca0f258d5fe9bfaed401958445014495dc115f202d43d5210b45241"
   TOOLCHAIN_DEST: "/opt/cross-pi/aarch64-linux-gnu"
 
+# Optional: OS/arch targets for CI/CD (one image per target; default: [linux/amd64])
+targets:
+  - linux/amd64
+  - linux/arm64
+
 toolchains:
   - ref: "toolchain.arm-gnu.aarch64-none-linux-gnu@stable"
     alias: TOOLCHAIN_64BIT
@@ -292,14 +297,15 @@ run_order:
 
 #### Manifest Fields
 
-| Field         | Required | Description                                      |
-| ------------- | -------- | ------------------------------------------------ |
-| `name`        | Yes      | Human-readable blueprint name                    |
-| `version`     | Yes      | Semantic version string                          |
-| `description` | No       | Brief description of the environment             |
-| `variables`   | No       | Key-value map of template variables              |
-| `toolchains`  | No       | List of catalog refs to resolve via the lockfile |
-| `run_order`   | Yes      | Ordered list of task files to execute            |
+| Field         | Required | Description                                                                 |
+| ------------- | -------- | --------------------------------------------------------------------------- |
+| `name`        | Yes      | Human-readable blueprint name                                               |
+| `version`     | Yes      | Semantic version string                                                     |
+| `description` | No       | Brief description of the environment                                        |
+| `variables`   | No       | Key-value map of template variables                                         |
+| `targets`     | No       | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
+| `toolchains`  | No       | List of catalog refs to resolve via the lockfile                            |
+| `run_order`   | Yes      | Ordered list of task files to execute                                       |
 
 #### Variables
 

@@ -102,6 +102,11 @@ variables:
   ARM_TOOLCHAIN_URL_arm64: "https://developer.arm.com/.../aarch64-arm-none-eabi.tar.xz"
   ARM_TOOLCHAIN_SHA_arm64: "c8824bffd057afce2259f7618254e840715f33523a3d..."
 
+# Optional: OS/arch targets for CI/CD (one image per target; default: [linux/amd64])
+targets:
+  - linux/amd64
+  - linux/arm64
+
 # Optional: catalog references (resolved to alloy.lock.yml)
 toolchains:
   - ref: "toolchain.arm-gnu.arm-none-eabi@stable"
@@ -119,14 +124,15 @@ run_order:
 
 #### Fields
 
-| Field         | Required | Type              | Description                                   |
-| ------------- | -------- | ----------------- | --------------------------------------------- |
-| `name`        | Yes      | string            | Human-readable name                           |
-| `version`     | Yes      | string            | Semantic version (e.g., `1.0.0`)              |
-| `description` | No       | string            | Brief description                             |
-| `variables`   | No       | map[string]string | Key-value pairs for template expansion        |
-| `toolchains`  | No       | list              | Catalog references to resolve via the catalog |
-| `run_order`   | Yes      | list of strings   | Task filenames in execution order             |
+| Field         | Required | Type              | Description                                                                 |
+| ------------- | -------- | ----------------- | --------------------------------------------------------------------------- |
+| `name`        | Yes      | string            | Human-readable name                                                         |
+| `version`     | Yes      | string            | Semantic version (e.g., `1.0.0`)                                            |
+| `description` | No       | string            | Brief description                                                           |
+| `variables`   | No       | map[string]string | Key-value pairs for template expansion                                      |
+| `targets`     | No       | list of strings   | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
+| `toolchains`  | No       | list              | Catalog references to resolve via the catalog                              |
+| `run_order`   | Yes      | list of strings   | Task filenames in execution order                                           |
 
 ### variables.yml (optional)
 

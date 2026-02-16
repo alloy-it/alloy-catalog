@@ -21,6 +21,12 @@ providers:
       linux/arm64:
         url: "https://go.dev/dl/go1.25.7.linux-arm64.tar.gz"
         sha256: "ba611a53534135a81067240eff9508cd7e256c560edd5d8c2fef54f083c07129"
+      darwin/amd64:
+        url: "https://go.dev/dl/go1.25.7.darwin-amd64.tar.gz"
+        sha256: "bf5050a2152f4053837b886e8d9640c829dbacbc3370f913351eb0904cb706f5"
+      darwin/arm64:
+        url: "https://go.dev/dl/go1.25.7.darwin-arm64.tar.gz"
+        sha256: "ff18369ffad05c57d5bed888b660b31385f3c913670a83ef557cdfd98ea9ae1b"
 
 install_hints:
   creates: "go/bin/go"
