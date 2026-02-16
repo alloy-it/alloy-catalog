@@ -38,8 +38,8 @@
 - name: "Run Zephyr SDK setup"
   action: "run_command"
   command: |
-    cd {{.Vars.ZEPHYR_SDK_DEST}} && ./setup.sh -t arm-zephyr-eabi -h -c
-  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/.setup_complete"
+    cd {{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-0.17.0 && ./setup.sh -t arm-zephyr-eabi -h -c
+  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-0.17.0/.setup_complete"
 
 - name: "Add Zephyr SDK to environment"
   action: "write_env_file"
