@@ -322,7 +322,7 @@ used action for installing toolchains and SDKs.
   action: "unarchive_from_url"
   dest: "/usr/local"
   creates: "/usr/local/go/bin/go"
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
   per_arch:
     amd64:
       url: "{{.Vars.GOLANG_URL_amd64}}"
@@ -375,7 +375,7 @@ environment variables.
     #!/bin/sh
     export PATH=$PATH:/opt/arm-toolchain/bin
     export CROSS_COMPILE=arm-none-eabi-
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 ```
 
 | Field     | Required | Description           |
@@ -499,7 +499,7 @@ symbolic or octal notation:
 | `USER_RWX`                    | 0700  | Owner only, full access              |
 | `USER_RW`                     | 0600  | Owner only, read/write               |
 
-Symbolic mode components must be **space-separated** (e.g. `USER_RW GROUP_R OTHER_R`). Underscore-joined values like `USER_RW_GROUP_R_OTHER_R` are not supported.
+Symbolic mode components must be **space-separated** (e.g. `USER_RW GROUP_R OTHER_R`). Underscore-joined values like `USER_RW GROUP_R OTHER_R` are not supported.
 
 **Octal:**
 
@@ -690,7 +690,7 @@ run_order:
   action: "unarchive_from_url"
   dest: "/usr/local"
   creates: "/usr/local/go/bin/go"
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
   per_arch:
     amd64:
       url: "{{.Vars.GOLANG_URL_amd64}}"
@@ -707,7 +707,7 @@ run_order:
     export PATH=$PATH:/usr/local/go/bin
     export GOPATH=$HOME/go
     export PATH=$PATH:$GOPATH/bin
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 ```
 
 **20-toolchain.yml** -- cross-compiler:
@@ -724,7 +724,7 @@ run_order:
   action: "unarchive_from_url"
   dest: "{{.Vars.TOOLCHAIN_DEST}}"
   creates: "{{.Vars.TOOLCHAIN_DEST}}/bin/aarch64-none-linux-gnu-gcc"
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
   owner: "root:root"
   per_arch:
     amd64:
@@ -741,7 +741,7 @@ run_order:
     #!/bin/sh
     export PATH=$PATH:{{.Vars.TOOLCHAIN_DEST}}/bin
     export CROSS_COMPILE=aarch64-none-linux-gnu-
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 
 - name: "Create CMake toolchain file"
   action: "write_env_file"

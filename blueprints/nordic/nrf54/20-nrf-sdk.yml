@@ -33,7 +33,7 @@
   content: |
     #!/bin/sh
     export ZEPHYR_BASE={{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 
 - name: "Initialize nRF Connect SDK with West"
   action: "run_command"
@@ -66,7 +66,7 @@
   ref: "tool.nordic.nrf-command-line-tools@stable"
   dest: "{{.Vars.NRF_TOOLS_DEST}}"
   creates: "{{.Vars.NRF_TOOLS_DEST}}/bin/nrfjprog"
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 
 - name: "Add Nordic tools to PATH"
   action: "write_env_file"
@@ -74,7 +74,7 @@
   content: |
     #!/bin/sh
     export PATH=$PATH:{{.Vars.NRF_TOOLS_DEST}}/bin
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 
 - name: "Create CMake presets directory"
   action: "run_command"
@@ -93,7 +93,7 @@
     set(GNUARMEMB_TOOLCHAIN_PATH {{.Vars.ARM_TOOLCHAIN_DEST}})
 
     list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/cmake)
-  mode: "USER_RW_GROUP_R_OTHER_R"
+  mode: "USER_RW GROUP_R OTHER_R"
 
 - name: "Create CMake toolchain file for nRF54L15"
   action: "write_env_file"
@@ -107,4 +107,4 @@
     set(GNUARMEMB_TOOLCHAIN_PATH {{.Vars.ARM_TOOLCHAIN_DEST}})
 
     list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/cmake)
-  mode: "USER_RW_GROUP_R_OTHER_R"
+  mode: "USER_RW GROUP_R OTHER_R"

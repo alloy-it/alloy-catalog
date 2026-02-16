@@ -34,7 +34,7 @@
   content: |
     #!/bin/sh
     export ZEPHYR_BASE={{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 
 # --- nRF Connect SDK ---
 - name: "Initialize nRF Connect SDK with West"
@@ -69,7 +69,7 @@
   ref: "tool.nordic.nrf-command-line-tools@stable"
   dest: "{{.Vars.NRF_TOOLS_DEST}}"
   creates: "{{.Vars.NRF_TOOLS_DEST}}/bin/nrfjprog"
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 
 - name: "Add Nordic tools to PATH"
   action: "write_env_file"
@@ -77,7 +77,7 @@
   content: |
     #!/bin/sh
     export PATH=$PATH:{{.Vars.NRF_TOOLS_DEST}}/bin
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 
 # --- CMake presets for nRF91 ---
 - name: "Create CMake presets directory"

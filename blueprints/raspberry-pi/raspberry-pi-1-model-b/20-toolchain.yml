@@ -15,7 +15,7 @@
   ref: "toolchain.arm-gnu.arm-none-linux-gnueabihf@stable"
   dest: "{{.Vars.TOOLCHAIN_32BIT_DEST}}"
   creates: "{{.Vars.TOOLCHAIN_32BIT_DEST}}/bin/arm-none-linux-gnueabihf-gcc"
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
   owner: "root:root"
 
 - name: "Add 32-bit toolchain to PATH"
@@ -25,7 +25,7 @@
     #!/bin/sh
     export PATH=$PATH:{{.Vars.TOOLCHAIN_32BIT_DEST}}/bin
     export CROSS_COMPILE_32=arm-none-linux-gnueabihf-
-  mode: "USER_RWX_GROUP_RX_OTHER_RX"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
 
 # --- CMake Toolchain Files ---
 - name: "Create CMake toolchain file for 32-bit Raspberry Pi"
@@ -51,4 +51,4 @@
 
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard" CACHE STRING "" FORCE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard" CACHE STRING "" FORCE)
-  mode: "USER_RW_GROUP_R_OTHER_R"
+  mode: "USER_RW GROUP_R OTHER_R"
