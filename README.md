@@ -208,7 +208,7 @@ Each platform entry contains:
 | `sha256`     | Yes      | SHA256 checksum    |
 | `size_bytes` | No       | File size in bytes |
 
-Supported host platforms: `linux/amd64`, `linux/arm64`.
+Supported host platforms: `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`. Each tool declares the platforms it supports in `host_platforms`; resolution picks the matching URL for the current host (e.g. darwin/arm64 on macOS Apple Silicon).
 
 #### Lifecycle
 

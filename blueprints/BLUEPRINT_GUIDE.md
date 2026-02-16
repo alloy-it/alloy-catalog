@@ -385,7 +385,7 @@ Also useful for udev rules, CMake toolchain files, and config files:
   file: "/etc/udev/rules.d/99-my-device.rules"
   content: |
     SUBSYSTEM=="usb", ATTR{idVendor}=="1234", MODE="0666", GROUP="plugdev"
-  mode: "USER_RW_GROUP_R_OTHER_R"
+  mode: "USER_RW GROUP_R OTHER_R"
 ```
 
 ### `install_target_lib`
@@ -486,12 +486,14 @@ symbolic or octal notation:
 
 **Symbolic (recommended):**
 
-| Value                        | Octal | Description                          |
-| ---------------------------- | ----- | ------------------------------------ |
-| `USER_RWX_GROUP_RX_OTHER_RX` | 0755  | Executable by all, writable by owner |
-| `USER_RW_GROUP_R_OTHER_R`    | 0644  | Readable by all, writable by owner   |
-| `USER_RWX`                   | 0700  | Owner only, full access              |
-| `USER_RW`                    | 0600  | Owner only, read/write               |
+| Value                         | Octal | Description                          |
+| ----------------------------- | ----- | ------------------------------------ |
+| `USER_RWX GROUP_RX OTHER_RX`  | 0755  | Executable by all, writable by owner |
+| `USER_RW GROUP_R OTHER_R`     | 0644  | Readable by all, writable by owner   |
+| `USER_RWX`                    | 0700  | Owner only, full access              |
+| `USER_RW`                     | 0600  | Owner only, read/write               |
+
+Symbolic mode components must be **space-separated** (e.g. `USER_RW GROUP_R OTHER_R`). Underscore-joined values like `USER_RW_GROUP_R_OTHER_R` are not supported.
 
 **Octal:**
 
@@ -543,8 +545,10 @@ Good `creates` values:
 ## Catalog References
 
 Instead of hardcoding download URLs in variables, you can reference tools
-from the catalog. The catalog maps tool IDs and version aliases to
-platform-specific download URLs.
+from the catalog. You describe the blueprint once; the catalog declares which
+host platforms each tool supports (e.g. `linux/amd64`, `linux/arm64`,
+`darwin/amd64`, `darwin/arm64`), and resolution assigns the correct URL and
+SHA256 for the current host OS and architecture.
 
 ### How It Works
 
@@ -557,8 +561,9 @@ platform-specific download URLs.
    ```
 
 2. `alloy-cicd resolve` (or `alloy-host resolve`) looks up `sdk.golang.go`
-   in the catalog, expands the `@stable` alias to a concrete version, and
-   writes the resolved URL and SHA256 to `alloy.lock.yml`.
+   in the catalog, expands the `@stable` alias to a concrete version, picks
+   the URL/SHA for the current host (e.g. darwin/arm64 on macOS Apple Silicon,
+   linux/amd64 on Linux x86_64), and writes them to `alloy.lock.yml`.
 
 3. If you specified an `alias`, two variables are injected:
    - `{{.Vars.GOLANG_URL}}` -- the resolved download URL
@@ -740,7 +745,7 @@ run_order:
     set(CMAKE_SYSTEM_PROCESSOR aarch64)
     set(CMAKE_C_COMPILER {{.Vars.TOOLCHAIN_DEST}}/bin/aarch64-none-linux-gnu-gcc)
     set(CMAKE_CXX_COMPILER {{.Vars.TOOLCHAIN_DEST}}/bin/aarch64-none-linux-gnu-g++)
-  mode: "USER_RW_GROUP_R_OTHER_R"
+  mode: "USER_RW GROUP_R OTHER_R"
 ```
 
 **99-cleanup.yml** -- reduce image size and verify:
