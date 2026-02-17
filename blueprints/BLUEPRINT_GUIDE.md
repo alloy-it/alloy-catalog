@@ -102,8 +102,8 @@ variables:
   ARM_TOOLCHAIN_URL_arm64: "https://developer.arm.com/.../aarch64-arm-none-eabi.tar.xz"
   ARM_TOOLCHAIN_SHA_arm64: "c8824bffd057afce2259f7618254e840715f33523a3d..."
 
-# Optional: OS/arch targets for CI/CD (one image per target; default: [linux/amd64])
-targets:
+# Optional: OS/arch supported hosts for CI/CD (one image per host; default: [linux/amd64])
+supported_hosts:
   - linux/amd64
   - linux/arm64
 
@@ -130,7 +130,7 @@ run_order:
 | `version`     | Yes      | string            | Semantic version (e.g., `1.0.0`)                                            |
 | `description` | No       | string            | Brief description                                                           |
 | `variables`   | No       | map[string]string | Key-value pairs for template expansion                                      |
-| `targets`     | No       | list of strings   | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
+| `supported_hosts` | No   | list of strings   | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
 | `toolchains`  | No       | list              | Catalog references to resolve via the catalog                              |
 | `run_order`   | Yes      | list of strings   | Task filenames in execution order                                           |
 

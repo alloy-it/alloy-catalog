@@ -5,7 +5,7 @@
 # toolchains, build tools, and development utilities.
 #
 name: "Raspberry Pi 1 Model A Dev Environment"
-version: "1.0.0"
+version: "1.0.1"
 description: "Provides cross-compilation toolchains and development tools for Raspberry Pi 1 Model A (32-bit)."
 
 #==================================================================
@@ -20,9 +20,9 @@ variables:
   SYSROOT_DIR: "/opt/cross-pi/sysroot"
 
 #==================================================================
-# Targets: OS/arch platforms this blueprint is built for (CI/CD creates one image per target).
+# Supported Hosts: OS/arch platforms this blueprint is built for (CI/CD creates one image per host).
 #==================================================================
-targets:
+supported_hosts:
   - linux/amd64
   - linux/arm64
 

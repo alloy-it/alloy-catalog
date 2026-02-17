@@ -265,7 +265,7 @@ The manifest is the entry point for a blueprint. It defines metadata, variables,
 
 ```yaml
 name: "Raspberry Pi 5 Dev Environment"
-version: "1.0.0"
+version: "1.0.1"
 description: "Cross-compilation toolchains and dev tools for Raspberry Pi 5."
 
 variables:
@@ -620,7 +620,7 @@ The same blueprint works on both architectures. The `per_arch` blocks ensure the
 
    ```yaml
    name: "My Board Dev Environment"
-   version: "1.0.0"
+   version: "1.0.1"
    description: "Development tools for My Board."
 
    variables:

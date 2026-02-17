@@ -5,7 +5,7 @@
 # Includes the nRF Connect SDK, Zephyr RTOS, and all required tools.
 #
 name: "Nordic nRF91 Dev Environment"
-version: "1.0.4"
+version: "1.0.5"
 description: "Provides the nRF Connect SDK, ARM toolchain, and development tools for nRF91 series."
 
 #==================================================================
@@ -19,9 +19,9 @@ variables:
   NRF_TOOLS_DEST: "/opt/nrf-command-line-tools"
 
 #==================================================================
-# Targets: OS/arch platforms this blueprint is built for (CI/CD creates one image per target).
+# Supported Hosts: OS/arch platforms this blueprint is built for (CI/CD creates one image per host).
 #==================================================================
-targets:
+supported_hosts:
   - linux/amd64
   - linux/arm64
 

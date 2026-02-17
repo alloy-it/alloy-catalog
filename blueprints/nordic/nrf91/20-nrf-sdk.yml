@@ -13,7 +13,11 @@
 - name: "Install West and Python dependencies"
   action: "run_command"
   command: |
-    pip3 install --break-system-packages \
+    PIP_BREAK_FLAG=""
+    if pip3 install --break-system-packages --help >/dev/null 2>&1; then
+      PIP_BREAK_FLAG="--break-system-packages"
+    fi
+    pip3 install $PIP_BREAK_FLAG \
       west \
       pyelftools \
       pyyaml \
@@ -53,9 +57,13 @@
 - name: "Install nRF Connect SDK Python requirements"
   action: "run_command"
   command: |
-    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
-    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
-    pip3 install --break-system-packages -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
+    PIP_BREAK_FLAG=""
+    if pip3 install --break-system-packages --help >/dev/null 2>&1; then
+      PIP_BREAK_FLAG="--break-system-packages"
+    fi
+    pip3 install $PIP_BREAK_FLAG -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
   creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
 
 - name: "Mark Python deps as installed"
