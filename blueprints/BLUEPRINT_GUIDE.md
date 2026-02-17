@@ -238,9 +238,18 @@ Installs system packages using `apt-get install -y`.
     - python3-pip
 ```
 
-| Field      | Required | Description                     |
-| ---------- | -------- | ------------------------------- |
-| `packages` | Yes      | List of apt packages to install |
+To pin a specific version, use APT's `package=version` syntax:
+
+```yaml
+- name: "Install Python 3.9"
+  action: "apt_install"
+  packages:
+    - "python3.9=3.9.2-1"
+```
+
+| Field      | Required | Description                                                                 |
+| ---------- | -------- | --------------------------------------------------------------------------- |
+| `packages` | Yes      | List of apt packages. Use `name=version` for a specific version (e.g. `python3.9=3.9.2-1`). |
 
 The provisioner runs `apt-get update` before installing.
 

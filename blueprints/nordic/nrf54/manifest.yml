@@ -5,7 +5,7 @@
 # Cortex-M33. Includes the nRF Connect SDK, Zephyr RTOS, and all required tools.
 #
 name: "Nordic nRF54 Dev Environment"
-version: "1.0.5"
+version: "1.0.8"
 description: "Provides the nRF Connect SDK, ARM toolchain, and development tools for nRF54 series."
 
 #==================================================================

@@ -14,6 +14,7 @@
   action: "unarchive_from_ref"
   ref: "toolchain.arm-gnu.arm-none-eabi@stable"
   dest: "{{.Vars.ARM_TOOLCHAIN_DEST}}"
+  strip_components: 1
   creates: "{{.Vars.ARM_TOOLCHAIN_DEST}}/bin/arm-none-eabi-gcc"
   mode: "USER_RWX GROUP_RX OTHER_RX"
   owner: "root:root"
