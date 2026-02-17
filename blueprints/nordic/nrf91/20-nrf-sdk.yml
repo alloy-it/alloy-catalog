@@ -10,6 +10,18 @@
     chown vagrant:vagrant {{.Vars.NCS_BASE}}
   creates: "{{.Vars.NCS_BASE}}"
 
+- name: "Clean up previous root pip installations"
+  action: "run_command"
+  command: |
+    if [ -f /root/.local/bin/west ]; then
+      rm -rf /root/.local/lib/python3*/site-packages/west*
+      rm -f /root/.local/bin/west
+    fi
+    if [ -f /usr/local/bin/west ]; then
+      pip3 uninstall -y west 2>/dev/null || true
+    fi
+  creates: "/home/vagrant/.local/bin/west"
+
 # --- Python dependencies and West ---
 - name: "Install West and Python dependencies"
   action: "run_command"
@@ -49,6 +61,7 @@
   run_as: "vagrant"
   command: |
     set -e
+    export PATH=$HOME/.local/bin:$PATH
     cd {{.Vars.NCS_BASE}}
     if [ ! -d "{{.Vars.NCS_VERSION}}" ]; then
       west init -m https://github.com/nrfconnect/sdk-nrf --mr {{.Vars.NCS_VERSION}} {{.Vars.NCS_VERSION}}
@@ -62,6 +75,7 @@
   action: "run_command"
   run_as: "vagrant"
   command: |
+    export PATH=$HOME/.local/bin:$PATH
     PIP_BREAK_FLAG=""
     if pip3 install --break-system-packages --help >/dev/null 2>&1; then
       PIP_BREAK_FLAG="--break-system-packages"

@@ -7,16 +7,31 @@
   command: |
     mkdir -p {{.Vars.NCS_BASE}}
     mkdir -p {{.Vars.NRF_TOOLS_DEST}}
+    chown vagrant:vagrant {{.Vars.NCS_BASE}}
   creates: "{{.Vars.NCS_BASE}}"
 
+- name: "Clean up previous root pip installations"
+  action: "run_command"
+  command: |
+    if [ -f /root/.local/bin/west ]; then
+      rm -rf /root/.local/lib/python3*/site-packages/west*
+      rm -f /root/.local/bin/west
+    fi
+    if [ -f /usr/local/bin/west ]; then
+      pip3 uninstall -y west 2>/dev/null || true
+    fi
+  creates: "/home/vagrant/.local/bin/west"
+
+# --- Python dependencies and West ---
 - name: "Install West and Python dependencies"
   action: "run_command"
+  run_as: "vagrant"
   command: |
     PIP_BREAK_FLAG=""
     if pip3 install --break-system-packages --help >/dev/null 2>&1; then
       PIP_BREAK_FLAG="--break-system-packages"
     fi
-    pip3 install $PIP_BREAK_FLAG \
+    pip3 install $PIP_BREAK_FLAG --user \
       west \
       pyelftools \
       pyyaml \
@@ -29,7 +44,7 @@
       intelhex \
       cryptography \
       cbor2
-  creates: "/usr/local/bin/west"
+  creates: "/home/vagrant/.local/bin/west"
 
 - name: "Add West environment"
   action: "write_env_file"
@@ -37,12 +52,16 @@
   content: |
     #!/bin/sh
     export ZEPHYR_BASE={{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr
+    export PATH=$PATH:$HOME/.local/bin
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
+# --- nRF Connect SDK ---
 - name: "Initialize nRF Connect SDK with West"
   action: "run_command"
+  run_as: "vagrant"
   command: |
     set -e
+    export PATH=$HOME/.local/bin:$PATH
     cd {{.Vars.NCS_BASE}}
     if [ ! -d "{{.Vars.NCS_VERSION}}" ]; then
       west init -m https://github.com/nrfconnect/sdk-nrf --mr {{.Vars.NCS_VERSION}} {{.Vars.NCS_VERSION}}
@@ -54,21 +73,25 @@
 
 - name: "Install nRF Connect SDK Python requirements"
   action: "run_command"
+  run_as: "vagrant"
   command: |
+    export PATH=$HOME/.local/bin:$PATH
     PIP_BREAK_FLAG=""
     if pip3 install --break-system-packages --help >/dev/null 2>&1; then
       PIP_BREAK_FLAG="--break-system-packages"
     fi
-    pip3 install $PIP_BREAK_FLAG -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
-    pip3 install $PIP_BREAK_FLAG -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
-    pip3 install $PIP_BREAK_FLAG -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG --user -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG --user -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG --user -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
   creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
 
 - name: "Mark Python deps as installed"
   action: "run_command"
+  run_as: "vagrant"
   command: "touch {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
   creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
 
+# --- Nordic Command Line Tools ---
 - name: "Install Nordic nRF Command Line Tools"
   action: "unarchive_from_ref"
   ref: "tool.nordic.nrf-command-line-tools@stable"
@@ -84,6 +107,7 @@
     export PATH=$PATH:{{.Vars.NRF_TOOLS_DEST}}/bin
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
+# --- CMake presets for nRF54 ---
 - name: "Create CMake presets directory"
   action: "run_command"
   command: "mkdir -p /opt/nordic/cmake"

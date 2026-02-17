@@ -4,16 +4,20 @@
 #
 - name: "Clean APT cache"
   action: "run_command"
+  always_run: true
   command: |
     apt-get clean
     rm -rf /var/lib/apt/lists/*
 
 - name: "Clean pip cache"
   action: "run_command"
+  run_as: "vagrant"
+  always_run: true
   command: "pip3 cache purge || true"
 
 - name: "Print installed tool versions"
   action: "run_command"
+  always_run: true
   command: |
     echo "=== Nordic nRF54 Dev Environment Setup Complete ==="
     echo ""
