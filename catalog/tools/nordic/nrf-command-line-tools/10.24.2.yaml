@@ -17,10 +17,10 @@ providers:
     host_platforms:
       linux/amd64:
         url: "https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x/10-24-2/nrf-command-line-tools-10.24.2_linux-amd64.tar.gz"
-        sha256: "7f03cb7e20ed17a1ae7bfa3d9e6f3c8a689b1d0e8f2c3a4b5d6e7f8a9b0c1d2e"
+        sha256: "9d65b0d80fccb567668fa41585c9261947b1740f52eba8d3a368cf6f8fd7b793"
       linux/arm64:
         url: "https://nsscprodmedia.blob.core.windows.net/prod/software-and-other-downloads/desktop-software/nrf-command-line-tools/sw/versions-10-x-x/10-24-2/nrf-command-line-tools-10.24.2_linux-arm64.tar.gz"
-        sha256: "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"
+        sha256: "568d1b7bac35fbcaa0320ef50dfc4fa94d672441636284ab532a05d74bc603d4"
 
 install_hints:
   creates: "bin/nrfjprog"
