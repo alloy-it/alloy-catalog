@@ -9,6 +9,7 @@
     mkdir -p {{.Vars.ZEPHYR_SDK_DEST}}
   creates: "{{.Vars.ARM_TOOLCHAIN_DEST}}"
 
+# --- ARM GNU Embedded Toolchain (arm-none-eabi) ---
 - name: "Install ARM GNU Embedded Toolchain"
   action: "unarchive_from_ref"
   ref: "toolchain.arm-gnu.arm-none-eabi@stable"
@@ -27,6 +28,7 @@
     export PATH=$PATH:{{.Vars.ARM_TOOLCHAIN_DEST}}/bin
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
+# --- Zephyr SDK ---
 - name: "Install Zephyr SDK"
   action: "unarchive_from_ref"
   ref: "sdk.zephyr.zephyr-sdk@stable"
@@ -37,8 +39,8 @@
 - name: "Run Zephyr SDK setup"
   action: "run_command"
   command: |
-    cd {{.Vars.ZEPHYR_SDK_DEST}} && ./setup.sh -t arm-zephyr-eabi -h -c
-  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/.setup_complete"
+    cd {{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-0.17.0 && ./setup.sh -t arm-zephyr-eabi -h -c
+  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-0.17.0/.setup_complete"
 
 - name: "Add Zephyr SDK to environment"
   action: "write_env_file"
@@ -48,6 +50,7 @@
     export ZEPHYR_SDK_INSTALL_DIR={{.Vars.ZEPHYR_SDK_DEST}}
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
+# --- Go Language ---
 - name: "Install Go"
   action: "unarchive_from_ref"
   ref: "sdk.golang.go@stable"

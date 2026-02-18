@@ -49,4 +49,4 @@
     echo ""
     echo "Quick Start:"
     echo "  cd {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
-    echo "  west build -b nrf9160dk_nrf9160_ns nrf/samples/cellular/hello_world"
+    echo "  west build -b nrf9160dk_nrf9160_ns nrf/samples/cellular/battery"
