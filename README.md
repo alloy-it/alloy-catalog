@@ -194,11 +194,11 @@ lifecycle:
 
 Each provider declares how the tool is delivered for each host platform:
 
-| Field            | Required | Description                                           |
-| ---------------- | -------- | ----------------------------------------------------- |
-| `id`             | Yes      | Provider identifier (e.g., `archive`, `source`)       |
+| Field            | Required | Description                                             |
+| ---------------- | -------- | ------------------------------------------------------- |
+| `id`             | Yes      | Provider identifier (e.g., `archive`, `source`)         |
 | `method`         | Yes      | Delivery method: `archive`, `source`, `alloy`, or `apt` |
-| `host_platforms` | Yes      | Map of `os/arch` keys to download details             |
+| `host_platforms` | Yes      | Map of `os/arch` keys to download details               |
 
 Each platform entry contains:
 
@@ -254,7 +254,7 @@ blueprints/<vendor>/<board>/
 
 The `<vendor>/<board>` path determines the Alloy Imageimage name when published:
 
-| Blueprint Path                            | Alloy ImageImage                                                     |
+| Blueprint Path                            | Alloy ImageImage                                              |
 | ----------------------------------------- | ------------------------------------------------------------- |
 | `blueprints/nordic/nrf91/`                | `api.alloy-it.io/community/nordic/nrf91:1.0.0`                |
 | `blueprints/raspberry-pi/raspberry-pi-5/` | `api.alloy-it.io/community/raspberry-pi/raspberry-pi-5:1.0.0` |
@@ -297,15 +297,15 @@ run_order:
 
 #### Manifest Fields
 
-| Field         | Required | Description                                                                 |
-| ------------- | -------- | --------------------------------------------------------------------------- |
-| `name`        | Yes      | Human-readable blueprint name                                               |
-| `version`     | Yes      | Semantic version string                                                     |
-| `description` | No       | Brief description of the environment                                        |
-| `variables`   | No       | Key-value map of template variables                                         |
+| Field         | Required | Description                                                                                |
+| ------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `name`        | Yes      | Human-readable blueprint name                                                              |
+| `version`     | Yes      | Semantic version string                                                                    |
+| `description` | No       | Brief description of the environment                                                       |
+| `variables`   | No       | Key-value map of template variables                                                        |
 | `targets`     | No       | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
-| `toolchains`  | No       | List of catalog refs to resolve via the lockfile                            |
-| `run_order`   | Yes      | Ordered list of task files to execute                                       |
+| `toolchains`  | No       | List of catalog refs to resolve via the lockfile                                           |
+| `run_order`   | Yes      | Ordered list of task files to execute                                                      |
 
 #### Variables
 
