@@ -5,6 +5,7 @@
 - name: "Update APT cache"
   action: "run_command"
   command: "apt-get update -y"
+  always_run: true
 
 - name: "Install Basic Tools"
   action: "apt_install"

@@ -5,7 +5,7 @@
 # toolchains, build tools, and development utilities.
 #
 name: "Raspberry Pi 1 Model A+ Dev Environment"
-version: "1.0.1"
+version: "1.0.2"
 description: "Provides cross-compilation toolchains and development tools for Raspberry Pi 1 Model A+ (32-bit)."
 
 #==================================================================
