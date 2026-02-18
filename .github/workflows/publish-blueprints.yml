@@ -1,13 +1,13 @@
-# Publish changed blueprints images to Alloy Registry
+# Publish changed blueprints to Alloy Registry
 #
 # Triggered when blueprints are modified on the main branch.
 # Detects which vendor/board blueprints changed, then runs the full
 # alloy-cicd pipeline per blueprint: validate, resolve per manifest target
 # (e.g. linux/amd64, linux/arm64), pack per target, and push a multi-arch
-# image index so clients can pull by platform.
+# blueprint index so clients can pull by platform.
 #
 # Directory layout: blueprints/<vendor>/<board>/manifest.yml
-# Alloy image path:   api.alloy-it.io/community/<vendor>/<board>:<version>
+# Blueprint path:   api.alloy-it.io/community/<vendor>/<board>:<version>
 
 name: Publish Blueprints
 
@@ -136,10 +136,8 @@ jobs:
           MANIFEST="blueprints/${{ matrix.blueprint }}/manifest.yml"
           VERSION=$(grep '^version:' "$MANIFEST" | sed 's/version: *"\{0,1\}\([^"]*\)"\{0,1\}/\1/')
           NAME=$(grep '^name:' "$MANIFEST" | sed 's/name: *"\{0,1\}\([^"]*\)"\{0,1\}/\1/')
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "name=${NAME}" >> "$GITHUB_OUTPUT"
-          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
           echo "Blueprint: ${NAME} v${VERSION} (${{ matrix.blueprint }})"
 
       - name: Run pipeline (multi-arch)
@@ -148,10 +146,9 @@ jobs:
           ALLOY_REGISTRY_PASSWORD: ${{ secrets.ALLOY_REGISTRY_PASSWORD }}
         run: |
           VERSION="${{ steps.meta.outputs.version }}"
-          SHORT_SHA="${{ steps.meta.outputs.short_sha }}"
 
           # Pipeline: validate, resolve per manifest target (linux/amd64, linux/arm64),
-          # pack per target, push multi-arch index. Uses manifest "targets:" not runner OS/arch.
+          # pack per target, push multi-arch blueprint index. Uses manifest "targets:" not runner OS/arch.
           ./alloy-cicd-bin pipeline \
             --repo . \
             --blueprint "blueprints/${{ matrix.blueprint }}" \
@@ -159,24 +156,6 @@ jobs:
             --registry "${{ env.REGISTRY }}" \
             --repository "${{ env.PROJECT }}/${{ matrix.blueprint }}" \
             --tag "${VERSION}" \
-            --log-json
-
-      - name: Push version+sha tag (traceability)
-        env:
-          ALLOY_REGISTRY_USERNAME: ${{ secrets.ALLOY_REGISTRY_USERNAME }}
-          ALLOY_REGISTRY_PASSWORD: ${{ secrets.ALLOY_REGISTRY_PASSWORD }}
-        run: |
-          VERSION="${{ steps.meta.outputs.version }}"
-          SHORT_SHA="${{ steps.meta.outputs.short_sha }}"
-
-          # Push same multi-arch image under version-sha tag (e.g. 1.0.0-abc1234)
-          ./alloy-cicd-bin pipeline \
-            --repo . \
-            --blueprint "blueprints/${{ matrix.blueprint }}" \
-            --catalog-repo . \
-            --registry "${{ env.REGISTRY }}" \
-            --repository "${{ env.PROJECT }}/${{ matrix.blueprint }}" \
-            --tag "${VERSION}-${SHORT_SHA}" \
             --log-json
 
       - name: Summary
