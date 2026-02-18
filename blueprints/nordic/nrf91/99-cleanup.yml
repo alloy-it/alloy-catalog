@@ -17,8 +17,10 @@
 
 - name: "Print installed tool versions"
   action: "run_command"
+  run_as: "vagrant"
   always_run: true
   command: |
+    export PATH=$HOME/.local/bin:$PATH
     echo "=== Nordic nRF91 Dev Environment Setup Complete ==="
     echo ""
     echo "ARM GNU Embedded Toolchain:"
