@@ -7,7 +7,7 @@
   command: |
     mkdir -p {{.Vars.NCS_BASE}}
     mkdir -p {{.Vars.NRF_TOOLS_DEST}}
-    chown vagrant:vagrant {{.Vars.NCS_BASE}}
+    chown {{.Vars.VM_USER}}:{{.Vars.VM_USER}} {{.Vars.NCS_BASE}}
   creates: "{{.Vars.NCS_BASE}}"
 
 - name: "Clean up previous root pip installations"
@@ -20,17 +20,17 @@
     if [ -f /usr/local/bin/west ]; then
       pip3 uninstall -y west 2>/dev/null || true
     fi
-  creates: "/home/vagrant/.local/bin/west"
+  creates: "/home/{{.Vars.VM_USER}}/.local/bin/west"
 
 # --- Python dependencies and West ---
-# We install Python packages as the vagrant user (run_as + --user) so that:
+# We install Python packages as the VM_USER (run_as + --user) so that:
 #   1. Packages land in ~/.local/bin and ~/.local/lib, avoiding system-wide conflicts.
-#   2. The vagrant user can manage them without sudo.
+#   2. The user can manage them without sudo.
 # The --break-system-packages flag is only added when pip supports it (pip 23.0.1+/Python 3.11+),
 # since older pip versions don't enforce PEP 668 externally-managed environments.
 - name: "Install West and Python dependencies"
   action: "run_command"
-  run_as: "vagrant"
+  run_as: "{{.Vars.VM_USER}}"
   command: |
     PIP_BREAK_FLAG=""
     if pip3 install --break-system-packages --help >/dev/null 2>&1; then
@@ -49,7 +49,7 @@
       intelhex \
       cryptography \
       cbor2
-  creates: "/home/vagrant/.local/bin/west"
+  creates: "/home/{{.Vars.VM_USER}}/.local/bin/west"
 
 - name: "Add West environment"
   action: "write_env_file"
@@ -61,11 +61,11 @@
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
 # --- nRF Connect SDK ---
-# West and SDK operations run as vagrant so the SDK directory is owned by the user.
+# West and SDK operations run as VM_USER so the SDK directory is owned by the user.
 # We prepend ~/.local/bin to PATH because west was installed with --user above.
 - name: "Initialize nRF Connect SDK with West"
   action: "run_command"
-  run_as: "vagrant"
+  run_as: "{{.Vars.VM_USER}}"
   command: |
     set -e
     export PATH=$HOME/.local/bin:$PATH
@@ -80,7 +80,7 @@
 
 - name: "Install nRF Connect SDK Python requirements"
   action: "run_command"
-  run_as: "vagrant"
+  run_as: "{{.Vars.VM_USER}}"
   command: |
     export PATH=$HOME/.local/bin:$PATH
     PIP_BREAK_FLAG=""
@@ -94,7 +94,7 @@
 
 - name: "Mark Python deps as installed"
   action: "run_command"
-  run_as: "vagrant"
+  run_as: "{{.Vars.VM_USER}}"
   command: "touch {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
   creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
 
