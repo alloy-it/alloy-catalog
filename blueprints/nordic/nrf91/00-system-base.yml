@@ -78,3 +78,4 @@
   action: "run_command"
   command: "udevadm control --reload-rules && udevadm trigger"
   always_run: true
+  skip_if: "[ \"$ALLOY_BACKEND\" = \"wsl2\" ]"
