@@ -18,7 +18,7 @@ This blueprint sets up a complete development environment for Nordic Semiconduct
 nrf91/
 ├── manifest.yml         # Entry point with variables and catalog refs
 ├── 00-system-base.yml   # Base packages and udev rules
-├── 10-arm-toolchain.yml # ARM toolchain, Zephyr SDK, Go (from catalog)
+├── 10-arm-zephyr.yml    # ARM toolchain, Zephyr SDK, Go (from catalog)
 ├── 20-nrf-sdk.yml       # nRF Connect SDK and Nordic CLI tools
 └── 99-cleanup.yml       # Final cleanup and verification
 ```
@@ -32,7 +32,6 @@ nrf91/
 | nRF Connect SDK            | `/opt/nordic/ncs/v2.9.0`          |
 | Nordic CLI Tools           | `/opt/nrf-command-line-tools`     |
 | CMake Toolchain Files      | `/opt/nordic/cmake/`              |
-| Go                         | `/usr/local/go`                   |
 
 ## Environment Variables
 
