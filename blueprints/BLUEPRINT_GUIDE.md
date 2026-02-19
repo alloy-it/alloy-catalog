@@ -93,6 +93,10 @@ version: "1.0.0"
 
 # Optional
 description: "ARM toolchain, Zephyr RTOS, and nRF Connect SDK for nRF91 series."
+# Optional OCI metadata (pushed as image annotations when set)
+# authors: "team@example.com"
+# vendor: "Nordic Semiconductor"
+# licenses: "Apache-2.0"
 
 # Variables available to task files via {{.Vars.NAME}}
 variables:
@@ -124,15 +128,18 @@ run_order:
 
 #### Fields
 
-| Field         | Required | Type              | Description                                                                 |
-| ------------- | -------- | ----------------- | --------------------------------------------------------------------------- |
-| `name`        | Yes      | string            | Human-readable name                                                         |
-| `version`     | Yes      | string            | Semantic version (e.g., `1.0.0`)                                            |
-| `description` | No       | string            | Brief description                                                           |
-| `variables`   | No       | map[string]string | Key-value pairs for template expansion                                      |
-| `supported_hosts` | No   | list of strings   | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
-| `toolchains`  | No       | list              | Catalog references to resolve via the catalog                              |
-| `run_order`   | Yes      | list of strings   | Task filenames in execution order                                           |
+| Field             | Required | Type              | Description                                                                                |
+| ----------------- | -------- | ----------------- | ------------------------------------------------------------------------------------------ |
+| `name`            | Yes      | string            | Human-readable name                                                                        |
+| `version`         | Yes      | string            | Semantic version (e.g., `1.0.0`)                                                           |
+| `description`     | No       | string            | Brief description                                                                          |
+| `authors`         | No       | string            | Contact details of maintainers                                                             |
+| `vendor`          | No       | string            | Distributing entity                                                                        |
+| `licenses`        | No       | string            | SPDX license expression                                                                    |
+| `variables`       | No       | map[string]string | Key-value pairs for template expansion                                                     |
+| `supported_hosts` | No       | list of strings   | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
+| `toolchains`      | No       | list              | Catalog references to resolve via the catalog                                              |
+| `run_order`       | Yes      | list of strings   | Task filenames in execution order                                                          |
 
 ### variables.yml (optional)
 
@@ -247,8 +254,8 @@ To pin a specific version, use APT's `package=version` syntax:
     - "python3.9=3.9.2-1"
 ```
 
-| Field      | Required | Description                                                                 |
-| ---------- | -------- | --------------------------------------------------------------------------- |
+| Field      | Required | Description                                                                                 |
+| ---------- | -------- | ------------------------------------------------------------------------------------------- |
 | `packages` | Yes      | List of apt packages. Use `name=version` for a specific version (e.g. `python3.9=3.9.2-1`). |
 
 The provisioner runs `apt-get update` before installing.
@@ -501,12 +508,12 @@ symbolic or octal notation:
 
 **Symbolic (recommended):**
 
-| Value                         | Octal | Description                          |
-| ----------------------------- | ----- | ------------------------------------ |
-| `USER_RWX GROUP_RX OTHER_RX`  | 0755  | Executable by all, writable by owner |
-| `USER_RW GROUP_R OTHER_R`     | 0644  | Readable by all, writable by owner   |
-| `USER_RWX`                    | 0700  | Owner only, full access              |
-| `USER_RW`                     | 0600  | Owner only, read/write               |
+| Value                        | Octal | Description                          |
+| ---------------------------- | ----- | ------------------------------------ |
+| `USER_RWX GROUP_RX OTHER_RX` | 0755  | Executable by all, writable by owner |
+| `USER_RW GROUP_R OTHER_R`    | 0644  | Readable by all, writable by owner   |
+| `USER_RWX`                   | 0700  | Owner only, full access              |
+| `USER_RW`                    | 0600  | Owner only, read/write               |
 
 Symbolic mode components must be **space-separated** (e.g. `USER_RW GROUP_R OTHER_R`). Underscore-joined values like `USER_RW GROUP_R OTHER_R` are not supported.
 
