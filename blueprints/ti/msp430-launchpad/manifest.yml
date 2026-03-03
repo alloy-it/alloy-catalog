@@ -1,0 +1,23 @@
+# Alloy Blueprint: ti/msp430-launchpad
+#
+# Development environment for TI MSP430 LaunchPad kits.
+# Provides the MSP430 GCC toolchain for ultra-low-power MCU development.
+#
+name: "TI MSP430 LaunchPad Dev Environment"
+version: "1.0.0"
+description: "TI MSP430 GCC toolchain for ultra-low-power MSP430 MCU development."
+
+variables:
+  TOOLCHAIN_DEST: "/opt/ti/msp430-gcc"
+
+supported_hosts:
+  - linux/amd64
+
+toolchains:
+  - ref: "toolchain.ti.msp430-elf-gcc@stable"
+    alias: TOOLCHAIN
+
+run_order:
+  - "00-system-base.yml"
+  - "10-toolchain.yml"
+  - "99-cleanup.yml"
