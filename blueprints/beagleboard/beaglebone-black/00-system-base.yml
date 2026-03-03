@@ -1,0 +1,51 @@
+#
+# 00-system-base.yml
+# Base system packages for BeagleBone Black development.
+#
+- name: "Update APT cache"
+  action: "run_command"
+  reason: "apt-get update has no dedicated primitive; must run before any apt_install step."
+  command: "apt-get update -y"
+  always_run: true
+
+- name: "Install build and cross-compilation tools"
+  action: "apt_install"
+  packages:
+    - "git"
+    - "build-essential"
+    - "cmake"
+    - "ninja-build"
+    - "wget"
+    - "curl"
+    - "xz-utils"
+    - "file"
+    - "ca-certificates"
+    - "device-tree-compiler"
+    - "u-boot-tools"
+    - "python3"
+    - "python3-pip"
+
+- name: "Allow passwordless sudo for sudo group"
+  action: "run_command"
+  reason: "Appending to /etc/sudoers has no dedicated primitive; echo redirect is the standard approach."
+  command: "echo '%sudo	ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
+  creates: "/etc/sudoers.d/alloy-sudoers"
+
+- name: "Configure udev rules for BeagleBone devices"
+  action: "write_env_file"
+  file: "/etc/udev/rules.d/99-beaglebone.rules"
+  content: |
+    # FTDI USB-Serial (FT232/FT2232 used by many JTAG probes and USB-UART cables)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", MODE="0666", GROUP="plugdev"
+    # TI XDS110 debug probe (used on BeagleBone AI and TI LaunchPads)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0451", MODE="0666", GROUP="plugdev"
+    # BeagleBone USB gadget (AM335x DFU / RNDIS / mass storage)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="1d6b", MODE="0666", GROUP="plugdev"
+  mode: "USER_RW GROUP_R OTHER_R"
+
+- name: "Reload udev rules"
+  action: "run_command"
+  reason: "udevadm control and trigger have no dedicated primitive beyond udev_rules (which requires a URL); inline rules are managed with write_env_file."
+  command: "udevadm control --reload-rules && udevadm trigger"
+  always_run: true
+  skip_if: "[ \"$ALLOY_BACKEND\" = \"wsl2\" ]"
