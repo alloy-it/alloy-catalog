@@ -1,0 +1,23 @@
+# Alloy Blueprint: espressif/esp32-idf
+#
+# ESP-IDF development environment for ESP32 family (ESP32, ESP32-S3, ESP32-C3, etc.).
+#
+name: "Espressif ESP32 ESP-IDF Dev Environment"
+version: "1.0.0"
+description: "ESP-IDF toolchain and environment for ESP32, ESP32-S3, ESP32-C3, and related SoCs."
+
+variables:
+  IDF_DEST: "/opt/esp-idf"
+  IDF_VERSION: "v5.4.1"
+  IDF_URL: "https://github.com/espressif/esp-idf.git"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+run_order:
+  - "00-system-base.yml"
+  - "10-esp-idf.yml"
+  - "15-udev.yml"
+  - "20-env.yml"
+  - "99-cleanup.yml"

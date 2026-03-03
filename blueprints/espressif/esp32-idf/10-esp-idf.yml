@@ -1,0 +1,22 @@
+#
+# 10-esp-idf.yml
+# Clone ESP-IDF and run install.sh for selected targets.
+#
+- name: "Install ESP-IDF via git and install script"
+  action: "mcu_sdk"
+  method: "git"
+  url: "{{.Vars.IDF_URL}}"
+  version: "{{.Vars.IDF_VERSION}}"
+  dest: "{{.Vars.IDF_DEST}}"
+  file: "install.sh"
+  install_args:
+    - "esp32"
+    - "esp32s3"
+    - "esp32c3"
+  packages:
+    - "git"
+    - "cmake"
+    - "ninja-build"
+    - "python3"
+    - "python3-pip"
+  creates: "{{.Vars.IDF_DEST}}/tools/idf.py"
