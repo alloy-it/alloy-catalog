@@ -1,0 +1,26 @@
+# Alloy Blueprint: generic/riscv
+#
+# Board-agnostic RISC-V cross-compilation environment (riscv64 Linux).
+# Suitable for SiFive HiFive Unmatched, StarFive VisionFive 2, Milk-V Pioneer,
+# and any RISC-V SoC running a Linux-based OS.
+#
+name: "Generic RISC-V Dev Environment"
+version: "1.0.0"
+description: "Board-agnostic RISC-V cross-compilation toolchain for riscv64 Linux targets."
+
+variables:
+  TOOLCHAIN_DEST: "/opt/riscv/riscv64-linux-gnu"
+  TOOLCHAIN_FILES_DIR: "/opt/riscv/cmake"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.riscv-gnu.riscv64-unknown-linux-gnu@stable"
+    alias: TOOLCHAIN
+
+run_order:
+  - "00-system-base.yml"
+  - "10-toolchain.yml"
+  - "99-cleanup.yml"

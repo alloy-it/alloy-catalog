@@ -1,0 +1,34 @@
+#
+# 99-cleanup.yml
+# Final cleanup and environment summary.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Print RISC-V environment summary"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  always_run: true
+  command: |
+    echo "=== Generic RISC-V Dev Environment Ready ==="
+    echo ""
+    echo "riscv64 toolchain:"
+    if [ "$(uname -m)" = "x86_64" ]; then
+      {{.Vars.TOOLCHAIN_DEST}}/bin/riscv64-unknown-linux-gnu-gcc --version | head -1
+    else
+      riscv64-linux-gnu-gcc --version | head -1
+    fi
+    echo ""
+    echo "CMake toolchain: {{.Vars.TOOLCHAIN_FILES_DIR}}/riscv64.cmake"
+    echo ""
+    echo "Quick start:"
+    echo "  cmake -DCMAKE_TOOLCHAIN_FILE={{.Vars.TOOLCHAIN_FILES_DIR}}/riscv64.cmake -B build"
+    echo ""
+    echo "For bare-metal RISC-V (RTOS/firmware), use the riscv32-unknown-elf or"
+    echo "riscv64-unknown-elf toolchain variant instead."
+    echo ""

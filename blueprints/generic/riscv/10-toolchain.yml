@@ -1,0 +1,87 @@
+#
+# 10-toolchain.yml
+# riscv64 Linux cross-compiler.
+#
+# Host-specific toolchain strategy:
+#   amd64: prebuilt binary from catalog (riscv64-unknown-linux-gnu- prefix)
+#   arm64: Ubuntu apt package gcc-riscv64-linux-gnu (riscv64-linux-gnu- prefix)
+#
+- name: "Create toolchain directories"
+  action: "run_command"
+  reason: "mkdir has no dedicated primitive; creating both TOOLCHAIN_DEST and TOOLCHAIN_FILES_DIR in a single step."
+  command: |
+    mkdir -p {{.Vars.TOOLCHAIN_DEST}}
+    mkdir -p {{.Vars.TOOLCHAIN_FILES_DIR}}
+  creates: "{{.Vars.TOOLCHAIN_FILES_DIR}}"
+
+# ── amd64: install prebuilt binary from catalog ──────────────────────────────
+
+- name: "Install riscv64 Linux toolchain (amd64 prebuilt)"
+  action: "unarchive_from_ref"
+  ref: "toolchain.riscv-gnu.riscv64-unknown-linux-gnu@stable"
+  dest: "{{.Vars.TOOLCHAIN_DEST}}"
+  strip_components: 1
+  creates: "{{.Vars.TOOLCHAIN_DEST}}/bin/riscv64-unknown-linux-gnu-gcc"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+  owner: "root:root"
+  skip_if: "test $(uname -m) = aarch64"
+
+- name: "Add toolchain to PATH (amd64)"
+  action: "write_env_file"
+  file: "/etc/profile.d/21-riscv-toolchain.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:{{.Vars.TOOLCHAIN_DEST}}/bin
+    export CROSS_COMPILE=riscv64-unknown-linux-gnu-
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+  skip_if: "test $(uname -m) = aarch64"
+
+- name: "Create CMake toolchain file for riscv64 (amd64)"
+  action: "write_env_file"
+  file: "{{.Vars.TOOLCHAIN_FILES_DIR}}/riscv64.cmake"
+  content: |
+    # CMake Toolchain File for RISC-V 64-bit Linux (riscv64)
+    set(CMAKE_SYSTEM_NAME Linux)
+    set(CMAKE_SYSTEM_PROCESSOR riscv64)
+    set(TOOLCHAIN_PREFIX riscv64-unknown-linux-gnu)
+    set(TOOLCHAIN_PATH {{.Vars.TOOLCHAIN_DEST}})
+    set(CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-g++)
+  mode: "USER_RW GROUP_R OTHER_R"
+  skip_if: "test $(uname -m) = aarch64"
+
+# ── arm64: install gcc-riscv64-linux-gnu from Ubuntu apt ─────────────────────
+# The apt package uses the riscv64-linux-gnu- prefix (Debian multiarch naming)
+# and installs to /usr/bin, which is already on PATH.
+
+- name: "Install riscv64 Linux toolchain (arm64 via apt)"
+  action: "apt_install"
+  packages:
+    - "gcc-riscv64-linux-gnu"
+    - "g++-riscv64-linux-gnu"
+    - "binutils-riscv64-linux-gnu"
+  creates: "/usr/bin/riscv64-linux-gnu-gcc"
+  skip_if: "test $(uname -m) = x86_64"
+
+- name: "Set CROSS_COMPILE for riscv64 (arm64)"
+  action: "write_env_file"
+  file: "/etc/profile.d/21-riscv-toolchain.sh"
+  content: |
+    #!/bin/sh
+    export CROSS_COMPILE=riscv64-linux-gnu-
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+  skip_if: "test $(uname -m) = x86_64"
+
+- name: "Create CMake toolchain file for riscv64 (arm64)"
+  action: "write_env_file"
+  file: "{{.Vars.TOOLCHAIN_FILES_DIR}}/riscv64.cmake"
+  content: |
+    # CMake Toolchain File for RISC-V 64-bit Linux (riscv64 — arm64 host)
+    # Uses the Ubuntu Debian-prefixed toolchain: gcc-riscv64-linux-gnu
+    set(CMAKE_SYSTEM_NAME Linux)
+    set(CMAKE_SYSTEM_PROCESSOR riscv64)
+    set(TOOLCHAIN_PREFIX riscv64-linux-gnu)
+    set(CMAKE_C_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-gcc)
+    set(CMAKE_CXX_COMPILER /usr/bin/${TOOLCHAIN_PREFIX}-g++)
+  mode: "USER_RW GROUP_R OTHER_R"
+  skip_if: "test $(uname -m) = x86_64"
