@@ -4,6 +4,7 @@
 #
 - name: "Clean APT cache"
   action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
   always_run: true
   command: |
     apt-get clean
@@ -11,12 +12,14 @@
 
 - name: "Clean pip cache"
   action: "run_command"
+  reason: "pip3 cache purge has no dedicated primitive; removing the pip download cache shrinks the final image."
   run_as: "{{.Vars.DEV_USERNAME}}"
   always_run: true
   command: "pip3 cache purge || true"
 
 - name: "Print installed tool versions"
   action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
   run_as: "{{.Vars.DEV_USERNAME}}"
   always_run: true
   command: |

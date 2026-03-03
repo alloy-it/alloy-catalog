@@ -4,6 +4,7 @@
 #
 - name: "Clean APT cache"
   action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
   always_run: true
   command: |
     apt-get clean
@@ -11,6 +12,7 @@
 
 - name: "Print installed toolchain versions"
   action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
   always_run: true
   command: |
     echo "=== Raspberry Pi Dev Environment Setup Complete ==="

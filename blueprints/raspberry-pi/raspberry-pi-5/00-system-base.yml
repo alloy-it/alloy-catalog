@@ -4,6 +4,7 @@
 #
 - name: "Update APT cache"
   action: "run_command"
+  reason: "apt-get update has no dedicated primitive; must run before any apt_install step."
   command: "apt-get update -y"
   always_run: true
 
@@ -57,15 +58,18 @@
 
 - name: "Allow passwordless sudo for sudo group"
   action: "run_command"
+  reason: "Appending to /etc/sudoers has no dedicated primitive; echo redirect is the standard approach."
   command: "echo '%sudo	ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
   creates: "/etc/sudoers.d/alloy-sudoers"
 
 - name: "Ensure binfmt service is running"
   action: "run_command"
+  reason: "Activating the binfmt-support service has no dedicated primitive; service start is required before binfmt handlers can be registered."
   command: "service binfmt-support start"
 
 - name: "Register QEMU arm binfmt"
   action: "run_command"
+  reason: "Registering a QEMU binfmt handler has no dedicated primitive; update-binfmts is the standard mechanism for transparent ARM emulation in chroots."
   command: |
     update-binfmts --install arm /usr/bin/qemu-arm-static \
       --magic $'\x7fELF\x01\x01\x01' \
@@ -79,6 +83,7 @@
 
 - name: "Register QEMU aarch64 binfmt"
   action: "run_command"
+  reason: "Registering a QEMU binfmt handler has no dedicated primitive; update-binfmts is the standard mechanism for transparent AArch64 emulation in chroots."
   command: |
     update-binfmts --install aarch64 /usr/bin/qemu-aarch64-static \
       --magic $'\x7fELF\x02\x01\x01' \

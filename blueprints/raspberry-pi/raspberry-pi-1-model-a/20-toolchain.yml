@@ -4,6 +4,7 @@
 #
 - name: "Create cross-compiler destination directories"
   action: "run_command"
+  reason: "mkdir has no dedicated primitive; pre-creating the destination directory tree ensures subsequent archive extractions land in the correct location."
   command: |
     mkdir -p {{.Vars.TOOLCHAIN_32BIT_DEST}}
     mkdir -p {{.Vars.TOOLCHAIN_FILES_DIR}}
