@@ -14,8 +14,13 @@ capabilities:
 providers:
   - id: pip
     method: pip
-    package: "west"
-    version: "1.3.0"
+    host_platforms:
+      linux/amd64:
+        package: "west"
+        version: "1.3.0"
+      linux/arm64:
+        package: "west"
+        version: "1.3.0"
 
 install_hints:
   creates: "west"

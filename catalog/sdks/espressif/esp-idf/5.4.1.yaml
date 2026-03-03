@@ -19,8 +19,13 @@ capabilities:
 providers:
   - id: git
     method: git
-    url: "https://github.com/espressif/esp-idf.git"
-    version: "v5.4.1"
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/espressif/esp-idf.git"
+        version: "v5.4.1"
+      linux/arm64:
+        url: "https://github.com/espressif/esp-idf.git"
+        version: "v5.4.1"
 
 install_hints:
   creates: "tools/idf.py"

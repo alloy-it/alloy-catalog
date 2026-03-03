@@ -18,8 +18,13 @@ capabilities:
 providers:
   - id: west
     method: west
-    url: "https://github.com/nrfconnect/sdk-nrf"
-    version: "v2.6.1"
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/nrfconnect/sdk-nrf"
+        version: "v2.6.1"
+      linux/arm64:
+        url: "https://github.com/nrfconnect/sdk-nrf"
+        version: "v2.6.1"
 
 install_hints:
   creates: "nrf"
