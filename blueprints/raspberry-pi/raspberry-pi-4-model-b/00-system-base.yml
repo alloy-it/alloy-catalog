@@ -58,7 +58,7 @@
 - name: "Allow passwordless sudo for sudo group"
   action: "run_command"
   command: "echo '%sudo	ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
-  creates: "/etc/sudoers.d/raspi-dev-sudoers"
+  creates: "/etc/sudoers.d/alloy-sudoers"
 
 - name: "Ensure binfmt service is running"
   action: "run_command"

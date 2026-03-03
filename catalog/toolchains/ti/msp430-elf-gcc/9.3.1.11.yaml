@@ -16,7 +16,7 @@ providers:
     host_platforms:
       linux/amd64:
         url: "https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-LlCjWuAbzH/9.3.1.2/msp430-gcc-9.3.1.11_linux64.tar.bz2"
-        sha256: "a1b2c3d4e5f60718293645564738495051627384950617283940516273849506"
+        sha256: "b60851b61565e3ddd2193298a3fac5120c2402597174106cc5f8482b9e9986e6"
 
 install_hints:
   creates: "bin/msp430-elf-gcc"

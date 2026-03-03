@@ -25,7 +25,7 @@ No binaries are hosted here. Downloads always come from the vendor's official se
               └─────┬──────┘            └─────┬──────┘
                     │                         │
                     ▼                         ▼
-           alloy.lock.yml             Alloy ImageRegistry
+           alloy.lock.yml             Alloy Blueprint Hub
            (pinned URLs)          (api.alloy-it.io)
                                          │
                                          ▼
@@ -72,11 +72,29 @@ alloy-catalog/
 │       └── libconfuse/libconfuse/
 ├── blueprints/                       # Environment definitions
 │   ├── nordic/
-│   │   └── nrf91/                    # Nordic nRF91 dev environment
-│   └── raspberry-pi/
-│       ├── raspberry-pi-5/           # Raspberry Pi 5 dev environment
-│       ├── raspberry-pi-4-model-b/
-│       └── ...
+│   │   ├── nrf91/                    # Nordic nRF91 dev environment
+│   │   ├── nrf52/                    # Nordic nRF52 dev environment
+│   │   └── nrf54/
+│   ├── raspberry-pi/
+│   │   ├── raspberry-pi-5/
+│   │   ├── raspberry-pi-4-model-b/
+│   │   ├── rp2040/                   # Raspberry Pi Pico / RP2040
+│   │   └── ...
+│   ├── espressif/
+│   │   └── esp32-idf/                # ESP32 ESP-IDF
+│   ├── st/
+│   │   ├── stm32-cube-gcc/           # STM32 ARM GCC + OpenOCD
+│   │   └── stm32mp157-dk2/           # STM32MP157-DK2 (Yocto)
+│   ├── beagleboard/
+│   │   └── beaglebone-black/
+│   ├── nxp/
+│   │   └── imx8mplus-evk/
+│   ├── nvidia/
+│   │   └── jetson-nano/
+│   └── generic/
+│       ├── yocto-image-builder/
+│       ├── buildroot-image-builder/
+│       └── zephyr/
 └── .github/workflows/
     ├── validate-blueprints.yml       # PR validation
     └── publish-blueprints.yml        # Publish on merge
@@ -243,6 +261,7 @@ A blueprint is a declarative definition of a development environment for a speci
 ```text
 blueprints/<vendor>/<board>/
 ├── manifest.yml          # Blueprint metadata, variables, and run order
+├── .env.example          # Template for required environment variables (commit this)
 ├── variables.yml         # Optional: additional variables (merged into manifest)
 ├── 00-system-base.yml    # Task file: system packages
 ├── 10-host-tools.yml     # Task file: host development tools
@@ -251,6 +270,8 @@ blueprints/<vendor>/<board>/
 ├── 99-cleanup.yml        # Task file: cleanup
 └── alloy.lock.yml        # Auto-generated: pinned download URLs (do not edit)
 ```
+
+The `.env.example` file is only needed when the blueprint requires environment variables (e.g. license keys or tokens). Users copy it to `.env`, fill in the values, and the provisioner loads it automatically.
 
 The `<vendor>/<board>` path determines the Alloy Imageimage name when published:
 
@@ -297,15 +318,16 @@ run_order:
 
 #### Manifest Fields
 
-| Field         | Required | Description                                                                                |
-| ------------- | -------- | ------------------------------------------------------------------------------------------ |
-| `name`        | Yes      | Human-readable blueprint name                                                              |
-| `version`     | Yes      | Semantic version string                                                                    |
-| `description` | No       | Brief description of the environment                                                       |
-| `variables`   | No       | Key-value map of template variables                                                        |
-| `targets`     | No       | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
-| `toolchains`  | No       | List of catalog refs to resolve via the lockfile                                           |
-| `run_order`   | Yes      | Ordered list of task files to execute                                                      |
+| Field          | Required | Description                                                                                |
+| -------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `name`         | Yes      | Human-readable blueprint name                                                              |
+| `version`      | Yes      | Semantic version string                                                                    |
+| `description`  | No       | Brief description of the environment                                                       |
+| `variables`    | No       | Key-value map of template variables                                                        |
+| `required_env` | No       | List of environment variables that must be set before provisioning runs (see below)        |
+| `targets`      | No       | OS/arch platforms for CI/CD (e.g. `linux/amd64`, `linux/arm64`). Default: `[linux/amd64]`. |
+| `toolchains`   | No       | List of catalog refs to resolve via the lockfile                                           |
+| `run_order`    | Yes      | Ordered list of task files to execute                                                      |
 
 #### Variables
 
@@ -318,6 +340,47 @@ Variables are resolved in this order (highest priority first):
 3. Injected toolchain variables from the lockfile (e.g., `TOOLCHAIN_64BIT_URL`, `TOOLCHAIN_64BIT_SHA`)
 
 An optional `variables.yml` file can provide additional variables. Manifest variables take precedence over `variables.yml` entries.
+
+#### Required Environment Variables
+
+Some blueprints need secrets or credentials that cannot be embedded in the manifest (license keys, tokens, private URLs). Declare them in `required_env` so the provisioner can catch them before any task runs:
+
+```yaml
+required_env:
+  - name: VENDOR_LICENSE_KEY
+    description: "License key from the vendor portal (https://vendor.example.com/keys)"
+  - name: GITLAB_TOKEN
+    description: "Personal access token with read_repository scope"
+```
+
+If any declared variable is missing or empty, the provisioner exits immediately with a single error listing all missing variables and where to set them — before touching the system.
+
+**Blueprint authors** must also ship a `.env.example` alongside `manifest.yml`:
+
+```bash
+# .env.example — copy to .env and fill in the values (do not commit .env)
+
+# Required: license key from the vendor portal
+# https://vendor.example.com/keys
+VENDOR_LICENSE_KEY=
+
+# Required: GitLab personal access token with read_repository scope
+GITLAB_TOKEN=
+```
+
+**How the provisioner loads environment variables** (in priority order, highest first):
+
+1. **OS environment** — variables already exported in the shell, or injected by alloy-host and CI/CD pipeline settings. These are never overridden.
+2. **`.env` file** — auto-detected next to `manifest.yml`, or supplied via `--env-file /path/to/file`. Variables from the file are only set if they are not already in the OS environment.
+
+For local development:
+
+```bash
+cp .env.example .env   # fill in your values; .env is gitignored
+alloy-provisioner --blueprint-dir .
+```
+
+For CI/CD (GitLab CI, GitHub Actions): add the required variables directly in the pipeline settings instead of committing a `.env` file.
 
 #### Toolchain References
 
@@ -472,7 +535,7 @@ The lockfile ensures reproducible builds: the same lockfile always produces the 
 
 ## Part 3: The CI/CD Pipeline
 
-When blueprints are modified and merged to `main`, GitHub Actions automatically validates, resolves, packs, and pushes them to the Alloy Imageregistry.
+When blueprints are modified and merged to `main`, GitHub Actions automatically validates, resolves, packs, and pushes them to the Alloy Blueprint Hub.
 
 ### What Happens on a Pull Request
 
@@ -532,7 +595,7 @@ The config blob (`application/vnd.alloy.blueprint.config.v1+json`) contains:
 
 ## Part 4: How the Provisioner Pulls and Installs a Blueprint
 
-The provisioner (`alloy-provisioner`) runs inside the guest VM and is responsible for pulling a blueprint from the Alloy Imageregistry and executing it.
+The provisioner (`alloy-provisioner`) runs inside the guest VM and is responsible for pulling a blueprint from the Alloy Blueprint Hub and executing it.
 
 ### Platform-Aware Pull
 
@@ -707,6 +770,7 @@ The same blueprint works on both architectures. The `per_arch` blocks ensure the
 - **Use variables** for versions, URLs, and SHA256 checksums. This keeps task files clean and makes updates easier.
 - **Put cleanup last** (`99-cleanup.yml`) to shrink the final image size.
 - **Name convention:** Use the vendor's official product name in lowercase with hyphens (e.g., `raspberry-pi-4-model-b`, `nrf91`).
+- **Declare required env vars.** If the blueprint needs credentials or tokens, add them to `required_env` in `manifest.yml` and ship a `.env.example` with clear descriptions. Never embed secrets in the manifest or task files.
 
 ### Using Catalog References
 

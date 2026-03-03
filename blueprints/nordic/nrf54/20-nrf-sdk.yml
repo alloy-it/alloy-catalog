@@ -1,17 +1,17 @@
 #
 # 20-nrf-sdk.yml
-# Installs nRF Connect SDK, West, and Nordic command line tools.
+# Installs West, nRF Connect SDK, and Nordic command line tools.
 #
-- name: "Create nRF Connect SDK directory"
-  action: "run_command"
-  command: |
-    mkdir -p {{.Vars.NCS_BASE}}
-    mkdir -p {{.Vars.NRF_TOOLS_DEST}}
-    chown {{.Vars.VM_USER}}:{{.Vars.VM_USER}} {{.Vars.NCS_BASE}}
-  creates: "{{.Vars.NCS_BASE}}"
+# SDK source: sdk.nordic.nrf-connect-sdk@stable  → NCS_URL / NCS_VERSION
+# West tool:  tool.python.west@stable             → WEST_VERSION
+#
 
+# --- West tool (from catalog: tool.python.west@stable) ---
+# West must be in PATH before the mcu_sdk step below.
 - name: "Clean up previous root pip installations"
   action: "run_command"
+  reason: "One-time migration: removes west installed system-wide or as root, which conflicts with user-scoped install via python_package."
+  run_as: "{{.Vars.DEV_USERNAME}}"
   command: |
     if [ -f /root/.local/bin/west ]; then
       rm -rf /root/.local/lib/python3*/site-packages/west*
@@ -20,24 +20,26 @@
     if [ -f /usr/local/bin/west ]; then
       pip3 uninstall -y west 2>/dev/null || true
     fi
-  creates: "/home/{{.Vars.VM_USER}}/.local/bin/west"
 
-# --- Python dependencies and West ---
-# We install Python packages as the VM_USER (run_as + --user) so that:
-#   1. Packages land in ~/.local/bin and ~/.local/lib, avoiding system-wide conflicts.
-#   2. The user can manage them without sudo.
-# The --break-system-packages flag is only added when pip supports it (pip 23.0.1+/Python 3.11+),
-# since older pip versions don't enforce PEP 668 externally-managed environments.
-- name: "Install West and Python dependencies"
+# Install west at the catalog-pinned version.
+# URL resolved from: tool.python.west@stable → pip package west=={{.Vars.WEST_VERSION}}
+- name: "Install West"
+  action: "python_package"
+  package: "west"
+  version: "{{.Vars.WEST_VERSION}}"
+
+# Install Zephyr/nRF helper packages required by west build commands.
+# These are transitive dependencies of the SDK, not first-class catalog entries.
+- name: "Install West Python helper packages"
   action: "run_command"
-  run_as: "{{.Vars.VM_USER}}"
+  reason: "Batch install of SDK transitive Python deps (pyelftools, pyyaml, etc.) has no dedicated primitive; these are pip packages without individual version pins in the catalog."
+  run_as: "{{.Vars.DEV_USERNAME}}"
   command: |
     PIP_BREAK_FLAG=""
     if pip3 install --break-system-packages --help >/dev/null 2>&1; then
       PIP_BREAK_FLAG="--break-system-packages"
     fi
     pip3 install $PIP_BREAK_FLAG --user \
-      west \
       pyelftools \
       pyyaml \
       pykwalify \
@@ -49,9 +51,8 @@
       intelhex \
       cryptography \
       cbor2
-  creates: "/home/{{.Vars.VM_USER}}/.local/bin/west"
 
-- name: "Add West environment"
+- name: "Add West to PATH"
   action: "write_env_file"
   file: "/etc/profile.d/20-west.sh"
   content: |
@@ -60,45 +61,48 @@
     export PATH=$PATH:$HOME/.local/bin
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
-# --- nRF Connect SDK ---
-# West and SDK operations run as VM_USER so the SDK directory is owned by the user.
-# We prepend ~/.local/bin to PATH because west was installed with --user above.
+# --- nRF Connect SDK (from catalog: sdk.nordic.nrf-connect-sdk@stable) ---
+# URL: {{.Vars.NCS_URL}}  Version: {{.Vars.NCS_VERSION}}
 - name: "Initialize nRF Connect SDK with West"
-  action: "run_command"
-  run_as: "{{.Vars.VM_USER}}"
-  command: |
-    set -e
-    export PATH=$HOME/.local/bin:$PATH
-    cd {{.Vars.NCS_BASE}}
-    if [ ! -d "{{.Vars.NCS_VERSION}}" ]; then
-      west init -m https://github.com/nrfconnect/sdk-nrf --mr {{.Vars.NCS_VERSION}} {{.Vars.NCS_VERSION}}
-      cd {{.Vars.NCS_VERSION}}
-      west update
-      west zephyr-export
-    fi
+  action: "mcu_sdk"
+  method: "west"
+  url: "{{.Vars.NCS_URL}}"
+  version: "{{.Vars.NCS_VERSION}}"
+  dest: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
+  run_as: "{{.Vars.DEV_USERNAME}}"
   creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf"
 
+# After west update, run zephyr-export so CMake can find the Zephyr packages.
+- name: "Export Zephyr CMake packages"
+  action: "run_command"
+  reason: "west zephyr-export registers Zephyr CMake package paths in the user's CMake cache; no dedicated primitive covers CMake package registration."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  command: |
+    export PATH=$HOME/.local/bin:$PATH
+    cd {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}} && west zephyr-export
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.zephyr_exported"
+
+# Install the SDK's pinned Python requirements from vendored requirements.txt files.
 - name: "Install nRF Connect SDK Python requirements"
   action: "run_command"
-  run_as: "{{.Vars.VM_USER}}"
+  reason: "pip install -r requirements.txt installs packages from a vendored requirements file inside the cloned SDK; no dedicated primitive covers requirements-file installs."
+  run_as: "{{.Vars.DEV_USERNAME}}"
   command: |
     export PATH=$HOME/.local/bin:$PATH
     PIP_BREAK_FLAG=""
     if pip3 install --break-system-packages --help >/dev/null 2>&1; then
       PIP_BREAK_FLAG="--break-system-packages"
     fi
-    pip3 install $PIP_BREAK_FLAG --user -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
-    pip3 install $PIP_BREAK_FLAG --user -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
-    pip3 install $PIP_BREAK_FLAG --user -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG --user \
+      -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG --user \
+      -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG --user \
+      -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
+    touch {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed
   creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
 
-- name: "Mark Python deps as installed"
-  action: "run_command"
-  run_as: "{{.Vars.VM_USER}}"
-  command: "touch {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
-  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
-
-# --- Nordic Command Line Tools ---
+# --- Nordic Command Line Tools (from catalog: tool.nordic.nrf-command-line-tools@stable) ---
 - name: "Install Nordic nRF Command Line Tools"
   action: "unarchive_from_ref"
   ref: "tool.nordic.nrf-command-line-tools@stable"
@@ -114,12 +118,9 @@
     export PATH=$PATH:{{.Vars.NRF_TOOLS_DEST}}/bin
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
-# --- CMake presets for nRF54 ---
-- name: "Create CMake presets directory"
-  action: "run_command"
-  command: "mkdir -p /opt/nordic/cmake"
-  creates: "/opt/nordic/cmake"
-
+# --- CMake presets for nRF54 boards ---
+# These are Zephyr-specific CMake files (BOARD, ZEPHYR_BASE, CMAKE_MODULE_PATH),
+# not generic cross-compilation toolchain files — use write_env_file rather than cmake_toolchain.
 - name: "Create CMake toolchain file for nRF54H20"
   action: "write_env_file"
   file: "/opt/nordic/cmake/nrf54h20.cmake"

@@ -4,6 +4,7 @@
 #
 - name: "Update APT cache"
   action: "run_command"
+  reason: "apt-get update has no dedicated primitive; must run before any apt_install step."
   command: "apt-get update -y"
   always_run: true
 
@@ -60,8 +61,9 @@
 
 - name: "Allow passwordless sudo for sudo group"
   action: "run_command"
+  reason: "Appending to /etc/sudoers has no dedicated primitive; echo redirect is the standard approach."
   command: "echo '%sudo	ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
-  creates: "/etc/sudoers.d/nrf54-dev-sudoers"
+  creates: "/etc/sudoers.d/alloy-sudoers"
 
 - name: "Configure udev rules for Nordic devices"
   action: "write_env_file"
@@ -76,6 +78,7 @@
 
 - name: "Reload udev rules"
   action: "run_command"
+  reason: "udevadm control and trigger have no dedicated primitive beyond udev_rules (which requires a URL); inline rules are managed with write_env_file."
   command: "udevadm control --reload-rules && udevadm trigger"
   always_run: true
   skip_if: "[ \"$ALLOY_BACKEND\" = \"wsl2\" ]"

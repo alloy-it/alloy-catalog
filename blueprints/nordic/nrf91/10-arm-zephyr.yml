@@ -1,13 +1,7 @@
 #
 # 10-arm-toolchain.yml
-# Installs ARM GNU Embedded Toolchain, Zephyr SDK, and Go from catalog.
+# Installs ARM GNU Embedded Toolchain and Zephyr SDK from catalog.
 #
-- name: "Create toolchain directories"
-  action: "run_command"
-  command: |
-    mkdir -p {{.Vars.ARM_TOOLCHAIN_DEST}}
-    mkdir -p {{.Vars.ZEPHYR_SDK_DEST}}
-  creates: "{{.Vars.ARM_TOOLCHAIN_DEST}}"
 
 # --- ARM GNU Embedded Toolchain (arm-none-eabi) ---
 - name: "Install ARM GNU Embedded Toolchain"
@@ -38,6 +32,7 @@
 
 - name: "Run Zephyr SDK setup"
   action: "run_command"
+  reason: "The Zephyr SDK self-registration (setup.sh) invokes cmake and registers toolchain cmake files; no dedicated primitive covers post-extract SDK registration scripts."
   command: |
     cd {{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-0.17.0 && ./setup.sh -t arm-zephyr-eabi -h -c
   creates: "{{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-0.17.0/.setup_complete"

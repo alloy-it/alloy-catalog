@@ -11,13 +11,13 @@
 
 - name: "Clean pip cache"
   action: "run_command"
-  run_as: "{{.Vars.VM_USER}}"
+  run_as: "{{.Vars.DEV_USERNAME}}"
   always_run: true
   command: "pip3 cache purge || true"
 
 - name: "Print installed tool versions"
   action: "run_command"
-  run_as: "{{.Vars.VM_USER}}"
+  run_as: "{{.Vars.DEV_USERNAME}}"
   always_run: true
   command: |
     export PATH=$HOME/.local/bin:$PATH
@@ -28,9 +28,6 @@
     echo ""
     echo "West version:"
     west --version
-    echo ""
-    echo "Go version:"
-    /usr/local/go/bin/go version
     echo ""
     echo "CMake version:"
     cmake --version | head -1
