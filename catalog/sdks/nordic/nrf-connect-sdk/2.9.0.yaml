@@ -1,0 +1,41 @@
+spec_version: 1
+id: sdk.nordic.nrf-connect-sdk
+version: "2.9.0"
+
+name: "nRF Connect SDK"
+homepage: "https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html"
+license: "Apache-2.0"
+
+capabilities:
+  - sdk.nordic
+  - rtos.zephyr
+  - target.arm-none-eabi
+  - target.cortex-m
+  - target.nrf91
+  - target.nrf54
+  - target.nrf52
+  - target.nrf53
+
+providers:
+  - id: west
+    method: west
+    url: "https://github.com/nrfconnect/sdk-nrf"
+    version: "v2.9.0"
+
+install_hints:
+  creates: "nrf"
+  requires_tool: "west"
+  note: |
+    Use the mcu_sdk action with method: west. west must be installed first
+    (use a python_package task referencing tool.python.west).
+    After west update, run: west zephyr-export
+    Then install SDK Python requirements from:
+      nrf/scripts/requirements.txt
+      zephyr/scripts/requirements.txt
+      bootloader/mcuboot/scripts/requirements.txt
+  env_vars:
+    ZEPHYR_BASE: "{dest}/zephyr"
+
+lifecycle:
+  status: stable
+  released_at: "2024-10-15"

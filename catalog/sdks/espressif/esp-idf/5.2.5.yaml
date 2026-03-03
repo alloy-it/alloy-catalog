@@ -1,0 +1,34 @@
+spec_version: 1
+id: sdk.espressif.esp-idf
+version: "5.2.5"
+
+name: "ESP-IDF — Espressif IoT Development Framework"
+homepage: "https://docs.espressif.com/projects/esp-idf/en/v5.2.5/esp32/index.html"
+license: "Apache-2.0"
+
+capabilities:
+  - sdk.espressif
+  - target.esp32
+  - target.esp32s3
+  - target.esp32c3
+  - target.esp32c6
+  - target.xtensa
+  - target.riscv32
+
+providers:
+  - id: git
+    method: git
+    url: "https://github.com/espressif/esp-idf.git"
+    version: "v5.2.5"
+
+install_hints:
+  creates: "tools/idf.py"
+  note: |
+    Use the mcu_sdk action with method: git.
+    After clone, run install.sh with target chips as install_args.
+  env_vars:
+    IDF_PATH: "{dest}"
+
+lifecycle:
+  status: stable
+  released_at: "2024-09-01"

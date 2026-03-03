@@ -1,0 +1,12 @@
+spec_version: 1
+id: tool.python.west
+type: index
+
+aliases:
+  latest: "1.3.0"
+  stable: "1.3.0"
+
+versions:
+  - version: "1.3.0"
+    file: "1.3.0.yaml"
+    status: stable

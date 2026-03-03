@@ -1,0 +1,16 @@
+spec_version: 1
+id: sdk.espressif.esp-idf
+type: index
+
+aliases:
+  latest: "5.4.1"
+  stable: "5.4.1"
+  lts: "5.2.5"
+
+versions:
+  - version: "5.4.1"
+    file: "5.4.1.yaml"
+    status: stable
+  - version: "5.2.5"
+    file: "5.2.5.yaml"
+    status: stable

@@ -1,0 +1,12 @@
+spec_version: 1
+id: tool.python.kas
+type: index
+
+aliases:
+  latest: "4.3.2"
+  stable: "4.3.2"
+
+versions:
+  - version: "4.3.2"
+    file: "4.3.2.yaml"
+    status: stable

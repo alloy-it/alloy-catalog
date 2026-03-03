@@ -1,0 +1,31 @@
+spec_version: 1
+id: tool.python.west
+version: "1.3.0"
+
+name: "West — Zephyr Project Meta-Tool"
+homepage: "https://docs.zephyrproject.org/latest/develop/west/index.html"
+license: "Apache-2.0"
+
+capabilities:
+  - tool.west
+  - tool.python
+  - sdk.zephyr
+
+providers:
+  - id: pip
+    method: pip
+    package: "west"
+    version: "1.3.0"
+
+install_hints:
+  creates: "west"
+  note: |
+    Install with the python_package action:
+      action: python_package
+      package: west
+      version: "1.3.0"
+    West must be in PATH before running mcu_sdk with method: west.
+
+lifecycle:
+  status: stable
+  released_at: "2024-11-01"

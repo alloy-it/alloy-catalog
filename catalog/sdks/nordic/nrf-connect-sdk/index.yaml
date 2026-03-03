@@ -1,0 +1,15 @@
+spec_version: 1
+id: sdk.nordic.nrf-connect-sdk
+type: index
+
+aliases:
+  latest: "2.9.0"
+  stable: "2.9.0"
+
+versions:
+  - version: "2.9.0"
+    file: "2.9.0.yaml"
+    status: stable
+  - version: "2.6.1"
+    file: "2.6.1.yaml"
+    status: stable

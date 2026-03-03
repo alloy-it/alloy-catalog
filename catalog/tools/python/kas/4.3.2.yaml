@@ -1,0 +1,31 @@
+spec_version: 1
+id: tool.python.kas
+version: "4.3.2"
+
+name: "kas — Yocto/OpenEmbedded Configuration Tool"
+homepage: "https://kas.readthedocs.io"
+license: "MIT"
+
+capabilities:
+  - tool.kas
+  - tool.python
+  - sdk.yocto
+
+providers:
+  - id: pip
+    method: pip
+    package: "kas"
+    version: "4.3.2"
+
+install_hints:
+  creates: "kas"
+  note: |
+    Install with the python_package action before running yocto_manifest with tool: kas:
+      action: python_package
+      package: kas
+      version: "4.3.2"
+    kas must be in PATH before the yocto_manifest step.
+
+lifecycle:
+  status: stable
+  released_at: "2024-09-01"
