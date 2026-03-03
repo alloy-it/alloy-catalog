@@ -1,0 +1,24 @@
+# Alloy Blueprint: generic/avr-atmega
+#
+# Board-agnostic AVR ATmega bare-metal development environment.
+# Suitable for ATmega328P, ATmega2560, ATmega32U4, ATtiny85, and any AVR 8-bit MCU.
+#
+name: "Generic AVR ATmega Dev Environment"
+version: "1.0.0"
+description: "AVR 8-bit bare-metal toolchain for ATmega/ATtiny microcontrollers."
+
+variables:
+  TOOLCHAIN_DEST: "/opt/avr/avr-gcc"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.avr-gnu.avr-gcc@stable"
+    alias: TOOLCHAIN
+
+run_order:
+  - "00-system-base.yml"
+  - "10-toolchain.yml"
+  - "99-cleanup.yml"

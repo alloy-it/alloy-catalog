@@ -1,0 +1,66 @@
+#
+# 10-toolchain.yml
+# AVR GCC toolchain installation.
+#
+# Host-specific toolchain strategy:
+#   amd64: prebuilt binary from catalog (modm-io avr-gcc 14.x)
+#   arm64: Ubuntu apt package gcc-avr (older version, same avr-gcc prefix)
+#
+- name: "Create toolchain directory (amd64)"
+  action: "run_command"
+  reason: "mkdir has no dedicated primitive; creating TOOLCHAIN_DEST before extraction."
+  command: "mkdir -p {{.Vars.TOOLCHAIN_DEST}}"
+  creates: "{{.Vars.TOOLCHAIN_DEST}}"
+  skip_if: "test $(uname -m) = aarch64"
+
+# ── amd64: install prebuilt binary from catalog ──────────────────────────────
+
+- name: "Install AVR GCC toolchain (amd64 prebuilt)"
+  action: "unarchive_from_ref"
+  ref: "toolchain.avr-gnu.avr-gcc@stable"
+  dest: "{{.Vars.TOOLCHAIN_DEST}}"
+  strip_components: 1
+  creates: "{{.Vars.TOOLCHAIN_DEST}}/bin/avr-gcc"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+  owner: "root:root"
+  skip_if: "test $(uname -m) = aarch64"
+
+- name: "Add AVR toolchain to PATH (amd64)"
+  action: "write_env_file"
+  file: "/etc/profile.d/30-avr-toolchain.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:{{.Vars.TOOLCHAIN_DEST}}/bin
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+  skip_if: "test $(uname -m) = aarch64"
+
+# ── arm64: install gcc-avr from Ubuntu apt ───────────────────────────────────
+# The Ubuntu gcc-avr package installs to /usr/bin (already on PATH).
+
+- name: "Install AVR GCC toolchain (arm64 via apt)"
+  action: "apt_install"
+  packages:
+    - "gcc-avr"
+    - "binutils-avr"
+  creates: "/usr/bin/avr-gcc"
+  skip_if: "test $(uname -m) = x86_64"
+
+# ── Both arches: udev rules for common AVR programmers ───────────────────────
+
+- name: "Install AVR programmer udev rules"
+  action: "write_env_file"
+  file: "/etc/udev/rules.d/99-avr.rules"
+  content: |
+    # USBasp programmer
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="05dc", MODE="0666", GROUP="plugdev"
+    # USBtinyISP programmer
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="1781", ATTRS{idProduct}=="0c9f", MODE="0666", GROUP="plugdev"
+    # Atmel ICE (CMSIS-DAP / debugWIRE / PDI / JTAG / SPI)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2141", MODE="0666", GROUP="plugdev"
+    # Arduino Mega 2560 (onboard USB-serial)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0042", MODE="0666", GROUP="plugdev"
+    # Arduino Uno (onboard USB-serial, ATmega16U2)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0043", MODE="0666", GROUP="plugdev"
+    # Microchip SNAP debugger
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2180", MODE="0666", GROUP="plugdev"
+  mode: "USER_RW GROUP_R OTHER_R"
