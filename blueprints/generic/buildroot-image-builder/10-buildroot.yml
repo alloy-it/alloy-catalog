@@ -1,0 +1,17 @@
+#
+# 10-buildroot.yml
+# Clone and configure Buildroot at a pinned version.
+#
+- name: "Configure Buildroot"
+  action: "buildroot_config"
+  url: "https://github.com/buildroot/buildroot"
+  version: "{{.Vars.BUILDROOT_VERSION}}"
+  dest: "{{.Vars.BUILDROOT_DEST}}"
+  packages:
+    - "git"
+    - "make"
+    - "gcc"
+    - "g++"
+    - "unzip"
+    - "bc"
+  creates: "{{.Vars.BUILDROOT_DEST}}/Makefile"
