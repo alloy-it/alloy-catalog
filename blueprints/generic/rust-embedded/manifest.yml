@@ -1,0 +1,23 @@
+# Alloy Blueprint: generic/rust-embedded
+#
+# Rust embedded development environment.
+# Provides Rust/Cargo, embedded cross-compilation targets (Cortex-M, RISC-V),
+# and the probe-rs toolkit for flashing and debugging.
+#
+name: "Generic Rust Embedded Dev Environment"
+version: "1.0.0"
+description: "Rust embedded toolchain with Cortex-M/RISC-V targets and probe-rs debug support."
+
+variables:
+  CARGO_HOME: "/usr/local/cargo"
+  RUSTUP_HOME: "/usr/local/rustup"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+run_order:
+  - "00-system-base.yml"
+  - "10-rust.yml"
+  - "20-cargo-tools.yml"
+  - "99-cleanup.yml"

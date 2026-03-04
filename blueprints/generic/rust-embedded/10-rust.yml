@@ -1,0 +1,44 @@
+#
+# 10-rust.yml
+# Rust toolchain installation via rustup, system-wide.
+# CARGO_HOME and RUSTUP_HOME are set to /usr/local to make cargo
+# available at /usr/local/bin/cargo for all users.
+#
+- name: "Install Rust toolchain via rustup"
+  action: "run_command"
+  reason: "rustup has no dedicated primitive; installing system-wide via official installer with pinned CARGO_HOME/RUSTUP_HOME for reproducibility."
+  command: |
+    export CARGO_HOME={{.Vars.CARGO_HOME}}
+    export RUSTUP_HOME={{.Vars.RUSTUP_HOME}}
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+      sh -s -- -y --no-modify-path --default-toolchain stable
+    ln -sf {{.Vars.CARGO_HOME}}/bin/rustup /usr/local/bin/rustup
+    ln -sf {{.Vars.CARGO_HOME}}/bin/cargo  /usr/local/bin/cargo
+  creates: "/usr/local/bin/cargo"
+
+- name: "Export Rust environment"
+  action: "write_env_file"
+  file: "/etc/profile.d/40-rust.sh"
+  content: |
+    #!/bin/sh
+    export CARGO_HOME={{.Vars.CARGO_HOME}}
+    export RUSTUP_HOME={{.Vars.RUSTUP_HOME}}
+    export PATH=$PATH:{{.Vars.CARGO_HOME}}/bin
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+
+- name: "Add embedded cross-compilation targets"
+  action: "run_command"
+  reason: "rustup target add has no dedicated primitive; adding all Cortex-M and RISC-V targets in a single step."
+  command: |
+    export CARGO_HOME={{.Vars.CARGO_HOME}}
+    export RUSTUP_HOME={{.Vars.RUSTUP_HOME}}
+    {{.Vars.CARGO_HOME}}/bin/rustup target add \
+      thumbv6m-none-eabi        \
+      thumbv7m-none-eabi        \
+      thumbv7em-none-eabi       \
+      thumbv7em-none-eabihf     \
+      thumbv8m.main-none-eabi   \
+      thumbv8m.main-none-eabihf \
+      riscv32imac-unknown-none-elf \
+      riscv32imc-unknown-none-elf
+  creates: "{{.Vars.RUSTUP_HOME}}/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/thumbv7em-none-eabihf"

@@ -1,0 +1,30 @@
+#
+# 00-system-base.yml
+# System dependencies for Rust embedded development.
+# probe-rs requires libudev and libusb for device access.
+#
+- name: "Update APT cache"
+  action: "run_command"
+  reason: "apt-get update has no dedicated primitive; must run before any apt_install step."
+  command: "apt-get update -y"
+  always_run: true
+
+- name: "Install system dependencies"
+  action: "apt_install"
+  packages:
+    - "git"
+    - "build-essential"
+    - "cmake"
+    - "ninja-build"
+    - "pkg-config"
+    - "libusb-1.0-0-dev"
+    - "libudev-dev"
+    - "libssl-dev"
+    - "ca-certificates"
+    - "curl"
+
+- name: "Allow passwordless sudo for sudo group"
+  action: "run_command"
+  reason: "Appending to /etc/sudoers has no dedicated primitive; echo redirect is the standard approach."
+  command: "echo '%sudo	ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
+  creates: "/etc/sudoers.d/alloy-sudoers"

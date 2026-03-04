@@ -1,0 +1,46 @@
+#
+# 20-cargo-tools.yml
+# Embedded Rust cargo tools installed via the rust_package primitive.
+# probe-rs: unified flashing and debugging for Cortex-M and RISC-V targets.
+# flip-link: zero-cost stack overflow protection for Cortex-M.
+# cargo-binutils: llvm-tools wrappers (objdump, size, nm, etc).
+#
+- name: "Install probe-rs"
+  action: "rust_package"
+  package: "probe-rs-tools"
+  version: "0.24.0"
+  creates: "{{.Vars.CARGO_HOME}}/bin/probe-rs"
+
+- name: "Install flip-link"
+  action: "rust_package"
+  package: "flip-link"
+  version: "0.1.9"
+  creates: "{{.Vars.CARGO_HOME}}/bin/flip-link"
+
+- name: "Install cargo-binutils"
+  action: "rust_package"
+  package: "cargo-binutils"
+  version: "0.3.6"
+  creates: "{{.Vars.CARGO_HOME}}/bin/cargo-objdump"
+
+- name: "Install probe-rs udev rules"
+  action: "write_env_file"
+  file: "/etc/udev/rules.d/99-probe-rs.rules"
+  content: |
+    # CMSIS-DAP v1 (HID)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0d28", ATTRS{idProduct}=="0204", MODE="0666", GROUP="plugdev"
+    # CMSIS-DAP v2 / DAPLink (bulk)
+    SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0d28", ATTRS{idProduct}=="0204", MODE="0666", GROUP="plugdev"
+    # ST-LINK/V2
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="0666", GROUP="plugdev"
+    # ST-LINK/V2-1 (Nucleo onboard)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374b", MODE="0666", GROUP="plugdev"
+    # ST-LINK/V3
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666", GROUP="plugdev"
+    # J-Link (all products)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="1366", MODE="0666", GROUP="plugdev"
+    # WCH-Link (CH32V series)
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="8010", MODE="0666", GROUP="plugdev"
+    # Raspberry Pi Debug Probe
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="2e8a", ATTRS{idProduct}=="000c", MODE="0666", GROUP="plugdev"
+  mode: "USER_RW GROUP_R OTHER_R"
