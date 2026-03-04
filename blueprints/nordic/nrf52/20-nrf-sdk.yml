@@ -1,0 +1,126 @@
+#
+# 20-nrf-sdk.yml
+# Installs West, nRF Connect SDK, and Nordic command line tools for nRF52.
+#
+- name: "Clean up previous root pip installations"
+  action: "run_command"
+  reason: "One-time migration: removes west installed system-wide or as root, which conflicts with user-scoped install via python_package."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  command: |
+    if [ -f /root/.local/bin/west ]; then
+      rm -rf /root/.local/lib/python3*/site-packages/west*
+      rm -f /root/.local/bin/west
+    fi
+    if [ -f /usr/local/bin/west ]; then
+      pip3 uninstall -y west 2>/dev/null || true
+    fi
+
+- name: "Install West"
+  action: "python_package"
+  package: "west"
+  version: "{{.Vars.WEST_VERSION}}"
+
+- name: "Install West Python helper packages"
+  action: "run_command"
+  reason: "Batch install of SDK transitive Python deps (pyelftools, pyyaml, etc.) has no dedicated primitive; these are pip packages without individual version pins in the catalog."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  command: |
+    PIP_BREAK_FLAG=""
+    if pip3 install --break-system-packages --help >/dev/null 2>&1; then
+      PIP_BREAK_FLAG="--break-system-packages"
+    fi
+    pip3 install $PIP_BREAK_FLAG --user \
+      pyelftools \
+      pyyaml \
+      pykwalify \
+      canopen \
+      packaging \
+      progress \
+      psutil \
+      anytree \
+      intelhex \
+      cryptography \
+      cbor2
+
+- name: "Add West to PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/20-west.sh"
+  content: |
+    #!/bin/sh
+    export ZEPHYR_BASE={{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr
+    export PATH=$PATH:$HOME/.local/bin
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+
+- name: "Initialize nRF Connect SDK with West"
+  action: "mcu_sdk"
+  method: "west"
+  url: "{{.Vars.NCS_URL}}"
+  version: "{{.Vars.NCS_VERSION}}"
+  dest: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf"
+
+- name: "Export Zephyr CMake packages"
+  action: "run_command"
+  reason: "west zephyr-export registers Zephyr CMake package paths in the user's CMake cache; no dedicated primitive covers CMake package registration."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  command: |
+    export PATH=$HOME/.local/bin:$PATH
+    cd {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}} && west zephyr-export
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.zephyr_exported"
+
+- name: "Install nRF Connect SDK Python requirements"
+  action: "run_command"
+  reason: "pip install -r requirements.txt installs packages from a vendored requirements file inside the cloned SDK; no dedicated primitive covers requirements-file installs."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  command: |
+    export PATH=$HOME/.local/bin:$PATH
+    PIP_BREAK_FLAG=""
+    if pip3 install --break-system-packages --help >/dev/null 2>&1; then
+      PIP_BREAK_FLAG="--break-system-packages"
+    fi
+    pip3 install $PIP_BREAK_FLAG --user \
+      -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG --user \
+      -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf/scripts/requirements.txt
+    pip3 install $PIP_BREAK_FLAG --user \
+      -r {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/bootloader/mcuboot/scripts/requirements.txt
+    touch {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.python_deps_installed"
+
+- name: "Install Nordic nRF Command Line Tools"
+  action: "unarchive_from_ref"
+  ref: "tool.nordic.nrf-command-line-tools@stable"
+  dest: "{{.Vars.NRF_TOOLS_DEST}}"
+  creates: "{{.Vars.NRF_TOOLS_DEST}}/bin/nrfjprog"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+
+- name: "Add Nordic tools to PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/21-nrf-tools.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:{{.Vars.NRF_TOOLS_DEST}}/bin
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+
+- name: "Create CMake toolchain file for nRF52840 DK"
+  action: "write_env_file"
+  file: "/opt/nordic/cmake/nrf52840.cmake"
+  content: |
+    # CMake configuration for nRF52840 DK with nRF Connect SDK
+    set(BOARD nrf52840dk_nrf52840)
+    set(ZEPHYR_BASE {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr)
+    set(GNUARMEMB_TOOLCHAIN_PATH {{.Vars.ARM_TOOLCHAIN_DEST}})
+    list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/cmake)
+  mode: "USER_RW GROUP_R OTHER_R"
+
+- name: "Create CMake toolchain file for nRF52832"
+  action: "write_env_file"
+  file: "/opt/nordic/cmake/nrf52832.cmake"
+  content: |
+    # CMake configuration for nRF52 DK (nRF52832) with nRF Connect SDK
+    set(BOARD nrf52dk_nrf52832)
+    set(ZEPHYR_BASE {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/zephyr)
+    set(GNUARMEMB_TOOLCHAIN_PATH {{.Vars.ARM_TOOLCHAIN_DEST}})
+    list(APPEND CMAKE_MODULE_PATH ${ZEPHYR_BASE}/cmake)
+  mode: "USER_RW GROUP_R OTHER_R"

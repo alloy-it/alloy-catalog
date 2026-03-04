@@ -1,0 +1,52 @@
+#
+# 99-cleanup.yml
+# Final cleanup tasks and environment verification.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Clean pip cache"
+  action: "run_command"
+  reason: "pip3 cache purge has no dedicated primitive; removing the pip download cache shrinks the final image."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  always_run: true
+  command: "pip3 cache purge || true"
+
+- name: "Print installed tool versions"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  always_run: true
+  command: |
+    export PATH=$HOME/.local/bin:$PATH
+    echo "=== Nordic nRF52 Dev Environment Setup Complete ==="
+    echo ""
+    echo "ARM GNU Embedded Toolchain:"
+    {{.Vars.ARM_TOOLCHAIN_DEST}}/bin/arm-none-eabi-gcc --version | head -1
+    echo ""
+    echo "West version:"
+    west --version
+    echo ""
+    echo "CMake version:"
+    cmake --version | head -1
+    echo ""
+    echo "Ninja version:"
+    ninja --version
+    echo ""
+    echo "nRF Connect SDK:"
+    echo "  Location: {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
+    echo "  Version: {{.Vars.NCS_VERSION}}"
+    echo ""
+    echo "CMake toolchain files:"
+    ls -la /opt/nordic/cmake/*.cmake 2>/dev/null || echo "  No toolchain files found"
+    echo ""
+    echo "=== Ready for nRF52 development! ==="
+    echo ""
+    echo "Quick Start:"
+    echo "  cd {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
+    echo "  west build -b nrf52840dk_nrf52840 nrf/samples/hello_world"
