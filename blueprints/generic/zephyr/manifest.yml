@@ -1,0 +1,24 @@
+# Alloy Blueprint: generic/zephyr
+#
+# Board-agnostic Zephyr RTOS SDK and west for any Zephyr-supported target.
+#
+name: "Generic Zephyr RTOS Dev Environment"
+version: "1.0.0"
+description: "Zephyr SDK and west for board-agnostic Zephyr development."
+
+variables:
+  ZEPHYR_SDK_DEST: "/opt/zephyr-sdk"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "sdk.zephyr.zephyr-sdk@stable"
+    alias: ZEPHYR_SDK
+
+run_order:
+  - "00-system-base.yml"
+  - "10-zephyr-sdk.yml"
+  - "20-west.yml"
+  - "99-cleanup.yml"

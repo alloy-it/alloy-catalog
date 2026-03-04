@@ -1,0 +1,25 @@
+#
+# 99-cleanup.yml
+# Final cleanup and environment summary.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Print Zephyr environment summary"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  always_run: true
+  command: |
+    echo "=== Generic Zephyr RTOS Dev Environment Ready ==="
+    echo ""
+    echo "Zephyr SDK: {{.Vars.ZEPHYR_SDK_DEST}}"
+    echo "West: $(which west 2>/dev/null || echo 'on PATH after sourcing profile')"
+    echo ""
+    echo "To create a Zephyr app: west init <dir> && cd <dir> && west update"
+    echo "Then: west build -b <board> <app_path>"
+    echo ""
