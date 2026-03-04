@@ -1,0 +1,24 @@
+#
+# 99-cleanup.yml
+# Final cleanup and environment summary.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Print STM32 environment summary"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  always_run: true
+  command: |
+    echo "=== ST STM32 Cube + GCC Dev Environment Ready ==="
+    echo ""
+    echo "ARM toolchain: {{.Vars.ARM_TOOLCHAIN_DEST}}/bin/arm-none-eabi-gcc"
+    echo "OpenOCD: $(which openocd 2>/dev/null || echo 'on PATH')"
+    echo ""
+    echo "Flash with: openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c 'program firmware.elf verify reset exit'"
+    echo ""

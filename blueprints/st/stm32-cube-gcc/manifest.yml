@@ -1,0 +1,25 @@
+# Alloy Blueprint: st/stm32-cube-gcc
+#
+# Generic STM32 development with ARM GCC and OpenOCD (no Zephyr).
+#
+name: "ST STM32 Cube + GCC Dev Environment"
+version: "1.0.0"
+description: "ARM GCC toolchain and OpenOCD for STM32 development (bare-metal or with STM32Cube)."
+
+variables:
+  ARM_TOOLCHAIN_DEST: "/opt/arm-none-eabi"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.arm-gnu.arm-none-eabi@stable"
+    alias: ARM_TOOLCHAIN
+
+run_order:
+  - "00-system-base.yml"
+  - "10-arm-toolchain.yml"
+  - "20-openocd.yml"
+  - "25-udev.yml"
+  - "99-cleanup.yml"

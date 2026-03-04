@@ -1,0 +1,8 @@
+#
+# 20-openocd.yml
+# OpenOCD for flashing and debugging STM32 (ST-Link).
+#
+- name: "Install OpenOCD"
+  action: "apt_install"
+  packages:
+    - "openocd"
