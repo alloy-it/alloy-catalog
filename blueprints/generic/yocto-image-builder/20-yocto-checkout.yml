@@ -1,0 +1,17 @@
+#
+# 20-yocto-checkout.yml
+# Configure Yocto layer set using kas (minimal poky-based config from kas-project).
+#
+- name: "Create build directory"
+  action: "run_command"
+  reason: "mkdir has no dedicated primitive; pre-creating the build directory ensures subsequent Yocto/repo initialization commands have a valid working directory."
+  command: "mkdir -p {{.Vars.BUILD_DIR}}"
+  creates: "{{.Vars.BUILD_DIR}}"
+
+- name: "Configure Yocto layers with kas"
+  action: "yocto_manifest"
+  tool: "kas"
+  url: "{{.Vars.KAS_CONFIG_URL}}"
+  file: "{{.Vars.KAS_CONFIG_FILE}}"
+  dest: "{{.Vars.BUILD_DIR}}"
+  creates: "{{.Vars.BUILD_DIR}}/conf/local.conf"

@@ -1,0 +1,23 @@
+# Alloy Blueprint: generic/yocto-image-builder
+#
+# Board-agnostic Yocto/OpenEmbedded environment using kas.
+# Teams can add their own layers and build custom Linux images.
+#
+name: "Generic Yocto Image Builder"
+version: "1.0.0"
+description: "Board-agnostic Yocto/Kas environment for building custom Linux images with OpenEmbedded."
+
+variables:
+  BUILD_DIR: "/opt/yocto/build"
+  KAS_CONFIG_URL: "https://github.com/kas-project/kas"
+  KAS_CONFIG_FILE: "kas.yml"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+run_order:
+  - "00-system-base.yml"
+  - "10-python-kas.yml"
+  - "20-yocto-checkout.yml"
+  - "99-cleanup.yml"
