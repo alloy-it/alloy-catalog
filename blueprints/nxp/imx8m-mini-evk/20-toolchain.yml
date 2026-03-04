@@ -1,0 +1,27 @@
+#
+# 20-toolchain.yml
+# Install aarch64 cross-compiler for i.MX 8M Mini application builds (from catalog).
+#
+- name: "Create toolchain destination"
+  action: "run_command"
+  reason: "mkdir has no dedicated primitive; creating the toolchain installation directory."
+  command: "mkdir -p /opt/nxp/imx8mmini/toolchain"
+  creates: "/opt/nxp/imx8mmini/toolchain"
+
+- name: "Install aarch64 Linux toolchain"
+  action: "unarchive_from_ref"
+  ref: "toolchain.arm-gnu.aarch64-none-linux-gnu@stable"
+  dest: "/opt/nxp/imx8mmini/toolchain"
+  strip_components: 1
+  creates: "/opt/nxp/imx8mmini/toolchain/bin/aarch64-none-linux-gnu-gcc"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+  owner: "root:root"
+
+- name: "Add toolchain to PATH"
+  action: "write_env_file"
+  file: "/etc/profile.d/20-nxp-imx8mmini-toolchain.sh"
+  content: |
+    #!/bin/sh
+    export PATH=$PATH:/opt/nxp/imx8mmini/toolchain/bin
+    export CROSS_COMPILE=aarch64-none-linux-gnu-
+  mode: "USER_RWX GROUP_RX OTHER_RX"

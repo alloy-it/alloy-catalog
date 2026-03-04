@@ -1,0 +1,18 @@
+#
+# 10-yocto-repo.yml
+# Initialize NXP i.MX 8M Mini Yocto layers using repo (imx-manifest).
+#
+- name: "Create build directory"
+  action: "run_command"
+  reason: "mkdir has no dedicated primitive; creating the Yocto workspace root."
+  command: "mkdir -p {{.Vars.BUILD_DIR}}"
+  creates: "{{.Vars.BUILD_DIR}}"
+
+- name: "Initialize NXP i.MX Yocto layers with repo"
+  action: "yocto_manifest"
+  tool: "repo"
+  url: "{{.Vars.IMX_MANIFEST_URL}}"
+  version: "{{.Vars.IMX_MANIFEST_BRANCH}}"
+  file: "{{.Vars.IMX_MANIFEST_FILE}}"
+  dest: "{{.Vars.BUILD_DIR}}"
+  creates: "{{.Vars.BUILD_DIR}}/.repo/manifest.xml"
