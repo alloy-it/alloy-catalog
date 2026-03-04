@@ -1,0 +1,36 @@
+#
+# 99-cleanup.yml
+# Final cleanup and environment summary.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Clean pip cache"
+  action: "run_command"
+  reason: "pip3 cache purge has no dedicated primitive; removing the pip download cache shrinks the final image."
+  always_run: true
+  command: "pip3 cache purge || true"
+
+- name: "Print AM62x environment summary"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  always_run: true
+  command: |
+    echo "=== TI AM62x Starter Kit Dev Environment Ready ==="
+    echo ""
+    echo "Yocto build dir: {{.Vars.BUILD_DIR}}"
+    echo ""
+    echo "aarch64 toolchain:"
+    {{.Vars.TOOLCHAIN_DEST}}/bin/aarch64-none-linux-gnu-gcc --version | head -1
+    echo ""
+    echo "Quick start:"
+    echo "  cd {{.Vars.BUILD_DIR}}"
+    echo "  kas build {{.Vars.KAS_CONFIG_URL}}/{{.Vars.KAS_CONFIG_FILE}}"
+    echo ""
+    echo "For SDK builds, see the TI AM62x SDK Getting Started Guide."
+    echo ""

@@ -1,0 +1,30 @@
+# Alloy Blueprint: ti/am62x-sk
+#
+# Yocto/kas dev environment for the Texas Instruments AM62x Starter Kit (SK-AM62).
+# Targets the Cortex-A53 application processor running TI's arago Linux distribution.
+# Uses meta-ti Yocto layers and the TI SDK kas configuration.
+#
+name: "TI AM62x Starter Kit Dev Environment"
+version: "1.0.0"
+description: "Yocto/kas environment and aarch64 toolchain for TI AM62x Starter Kit (Cortex-A53)."
+
+variables:
+  BUILD_DIR: "/opt/yocto/am62x"
+  KAS_CONFIG_URL: "https://git.ti.com/cgit/arago-project/meta-arago"
+  KAS_CONFIG_FILE: "kas/ti-core-bundle.yml"
+  TOOLCHAIN_DEST: "/opt/ti/am62x/toolchain"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.arm-gnu.aarch64-none-linux-gnu@stable"
+    alias: TOOLCHAIN
+
+run_order:
+  - "00-system-base.yml"
+  - "10-python-kas.yml"
+  - "20-yocto-checkout.yml"
+  - "30-toolchain.yml"
+  - "99-cleanup.yml"
