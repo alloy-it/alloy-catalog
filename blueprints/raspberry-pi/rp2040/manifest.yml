@@ -1,0 +1,27 @@
+# Alloy Blueprint: raspberry-pi/rp2040
+#
+# Pico SDK and ARM GCC for Raspberry Pi RP2040 (Pico, Pico W, etc.).
+#
+name: "Raspberry Pi RP2040 (Pico) Dev Environment"
+version: "1.0.0"
+description: "Pico SDK and ARM toolchain for RP2040 development."
+
+variables:
+  ARM_TOOLCHAIN_DEST: "/opt/arm-none-eabi"
+  PICO_SDK_DEST: "/opt/pico-sdk"
+  PICO_SDK_URL: "https://github.com/raspberrypi/pico-sdk"
+  PICO_SDK_VERSION: "1.6.0"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.arm-gnu.arm-none-eabi@stable"
+    alias: ARM_TOOLCHAIN
+
+run_order:
+  - "00-system-base.yml"
+  - "10-arm-toolchain.yml"
+  - "20-pico-sdk.yml"
+  - "99-cleanup.yml"

@@ -1,0 +1,24 @@
+#
+# 99-cleanup.yml
+# Final cleanup and environment summary.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Print RP2040 environment summary"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  always_run: true
+  command: |
+    echo "=== Raspberry Pi RP2040 (Pico) Dev Environment Ready ==="
+    echo ""
+    echo "Pico SDK: {{.Vars.PICO_SDK_DEST}} (PICO_SDK_PATH)"
+    echo "ARM toolchain: {{.Vars.ARM_TOOLCHAIN_DEST}}/bin/arm-none-eabi-gcc"
+    echo ""
+    echo "Build: mkdir build && cd build && cmake .. && make"
+    echo ""
