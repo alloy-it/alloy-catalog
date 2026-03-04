@@ -1,0 +1,24 @@
+#
+# 99-cleanup.yml
+# Final cleanup and environment summary.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Print Jetson Nano environment summary"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  always_run: true
+  command: |
+    echo "=== NVIDIA Jetson Nano Dev Environment Ready ==="
+    echo ""
+    echo "aarch64 toolchain: {{.Vars.TOOLCHAIN_DEST}}/bin/aarch64-none-linux-gnu-gcc"
+    echo "CMake toolchain: {{.Vars.TOOLCHAIN_FILES_DIR}}/jetson-nano.cmake"
+    echo ""
+    echo "For CUDA/TensorRT, install JetPack on the Jetson device and use the SDK sysroot for linking."
+    echo ""

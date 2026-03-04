@@ -1,0 +1,30 @@
+#
+# 00-system-base.yml
+# Base system packages for Jetson Nano development.
+#
+- name: "Update APT cache"
+  action: "run_command"
+  reason: "apt-get update has no dedicated primitive; must run before any apt_install step."
+  command: "apt-get update -y"
+  always_run: true
+
+- name: "Install build and cross-compilation tools"
+  action: "apt_install"
+  packages:
+    - "git"
+    - "build-essential"
+    - "cmake"
+    - "ninja-build"
+    - "wget"
+    - "curl"
+    - "xz-utils"
+    - "file"
+    - "ca-certificates"
+    - "python3"
+    - "python3-pip"
+
+- name: "Allow passwordless sudo for sudo group"
+  action: "run_command"
+  reason: "Appending to /etc/sudoers has no dedicated primitive; echo redirect is the standard approach."
+  command: "echo '%sudo	ALL=(ALL:ALL) NOPASSWD:ALL' >> /etc/sudoers"
+  creates: "/etc/sudoers.d/alloy-sudoers"
