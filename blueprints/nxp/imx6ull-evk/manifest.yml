@@ -1,0 +1,26 @@
+# Alloy Blueprint: nxp/imx6ull-evk
+#
+# Cross-compilation environment for NXP i.MX 6ULL (single Cortex-A7, 32-bit Linux).
+# Provides arm toolchain and CMake integration for kernel, drivers, and applications.
+# Widely used on MCIMX6ULL-EVK, Olimex IMX6, SolidRun HummingBoard, and custom PCBs.
+#
+name: "NXP i.MX 6ULL EVK Dev Environment"
+version: "1.0.0"
+description: "Cross-compilation toolchain for NXP i.MX 6ULL (Cortex-A7, 32-bit Linux)."
+
+variables:
+  TOOLCHAIN_DEST: "/opt/nxp/imx6ull/toolchain"
+  TOOLCHAIN_FILES_DIR: "/opt/nxp/cmake"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.arm-gnu.arm-none-linux-gnueabihf@stable"
+    alias: TOOLCHAIN
+
+run_order:
+  - "00-system-base.yml"
+  - "10-toolchain.yml"
+  - "99-cleanup.yml"
