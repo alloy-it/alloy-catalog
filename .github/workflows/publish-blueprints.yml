@@ -101,12 +101,14 @@ jobs:
       - name: Build
         run: |
           cd alloy-cicd
-          CGO_ENABLED=0 go build -o ../alloy-cicd-bin ./cmd/alloy-cicd
+          mkdir -p ../alloy-cicd-build
+          CGO_ENABLED=0 go build -o ../alloy-cicd-build/alloy-cicd-bin ./cmd/alloy-cicd
 
-      - uses: actions/upload-artifact@v4
+      - name: Cache alloy-cicd binary
+        uses: actions/cache/save@v4
         with:
-          name: alloy-cicd-bin
-          path: alloy-cicd-bin
+          path: alloy-cicd-build
+          key: alloy-cicd-${{ runner.os }}-${{ hashFiles('alloy-cicd/go.sum', 'alloy-cicd/**/*.go') }}
 
   # ---------------------------------------------------------------------------
   # 3. Validate, resolve, pack, and push each changed blueprint
@@ -123,12 +125,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
+      - name: Checkout alloy-cicd
+        uses: actions/checkout@v4
         with:
-          name: alloy-cicd-bin
+          repository: ${{ github.repository_owner }}/alloy-cicd
+          token: ${{ secrets.ALLOY_CICD_TOKEN }}
+          path: alloy-cicd
+
+      - name: Restore alloy-cicd binary
+        uses: actions/cache/restore@v4
+        with:
+          path: alloy-cicd-build
+          key: alloy-cicd-${{ runner.os }}-${{ hashFiles('alloy-cicd/go.sum', 'alloy-cicd/**/*.go') }}
+
+      - name: Verify alloy-cicd binary
+        run: test -f alloy-cicd-build/alloy-cicd-bin
 
       - name: Make binary executable
-        run: chmod +x alloy-cicd-bin
+        run: chmod +x alloy-cicd-build/alloy-cicd-bin
 
       - name: Read blueprint metadata
         id: meta
@@ -149,7 +163,7 @@ jobs:
 
           # Pipeline: validate, resolve per manifest target (linux/amd64, linux/arm64),
           # pack per target, push multi-arch blueprint index. Uses manifest "targets:" not runner OS/arch.
-          ./alloy-cicd-bin pipeline \
+          ./alloy-cicd-build/alloy-cicd-bin pipeline \
             --repo . \
             --blueprint "blueprints/${{ matrix.blueprint }}" \
             --catalog-repo . \
