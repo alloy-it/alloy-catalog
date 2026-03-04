@@ -1,0 +1,29 @@
+# Alloy Blueprint: nxp/imx93-evk
+#
+# Yocto-based dev environment for NXP i.MX 93 (MCIMX93EVK).
+# Uses NXP's imx-manifest (repo tool) with the Scarthgap BSP (kernel 6.6).
+# i.MX 93 is NXP's current-generation SoC: dual Cortex-A55 + Cortex-M33.
+#
+name: "NXP i.MX 93 EVK Dev Environment"
+version: "1.0.0"
+description: "Yocto/BSP environment for NXP i.MX 93 EVK using NXP imx-manifest (Scarthgap)."
+
+variables:
+  BUILD_DIR: "/opt/yocto/imx93"
+  IMX_MANIFEST_BRANCH: "imx-linux-scarthgap"
+  IMX_MANIFEST_FILE: "imx-6.6.23-2.0.0.xml"
+  IMX_MANIFEST_URL: "https://github.com/nxp-imx/imx-manifest"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.arm-gnu.aarch64-none-linux-gnu@stable"
+    alias: TOOLCHAIN_64BIT
+
+run_order:
+  - "00-system-base.yml"
+  - "10-yocto-repo.yml"
+  - "20-toolchain.yml"
+  - "99-cleanup.yml"
