@@ -10,9 +10,9 @@ description: "AVR 8-bit bare-metal toolchain for ATmega/ATtiny microcontrollers.
 variables:
   TOOLCHAIN_DEST: "/opt/avr/avr-gcc"
 
+# AVR GCC in catalog is amd64-only; omit linux/arm64 until catalog has a provider.
 supported_hosts:
   - linux/amd64
-  - linux/arm64
 
 toolchains:
   - ref: "toolchain.avr-gnu.avr-gcc@stable"
