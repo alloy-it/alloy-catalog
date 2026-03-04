@@ -1,0 +1,8 @@
+#
+# 10-python-kas.yml
+# Install kas for Yocto layer management.
+#
+- name: "Install kas"
+  action: "python_package"
+  package: "kas"
+  version: "4.3.2"

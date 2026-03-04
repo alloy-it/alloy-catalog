@@ -1,0 +1,28 @@
+# Alloy Blueprint: st/stm32mp157-dk2
+#
+# OpenSTLinux (Yocto) dev environment for STM32MP157-DK2.
+# Uses kas for layer management; add meta-st-stm32mp for full BSP.
+#
+name: "ST STM32MP157-DK2 Dev Environment"
+version: "1.0.0"
+description: "Yocto/kas environment and ARM toolchain for STM32MP157-DK2 (Cortex-A7)."
+
+variables:
+  BUILD_DIR: "/opt/yocto/stm32mp157-dk2"
+  KAS_CONFIG_URL: "https://github.com/kas-project/kas"
+  KAS_CONFIG_FILE: "kas.yml"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.arm-gnu.arm-none-linux-gnueabihf@stable"
+    alias: TOOLCHAIN_ARM
+
+run_order:
+  - "00-system-base.yml"
+  - "10-python-kas.yml"
+  - "20-yocto-checkout.yml"
+  - "30-toolchain.yml"
+  - "99-cleanup.yml"
