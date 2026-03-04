@@ -1,0 +1,24 @@
+# Alloy Blueprint: generic/riscv32-bare-metal
+#
+# Board-agnostic RISC-V 32-bit bare-metal cross-compilation environment.
+# Suitable for CH32V series, SiFive FE310, GD32VF103, and any RISC-V 32-bit MCU.
+#
+name: "Generic RISC-V 32-bit Bare-Metal Dev Environment"
+version: "1.0.0"
+description: "RISC-V 32-bit bare-metal (elf) cross-compilation toolchain for MCU targets."
+
+variables:
+  TOOLCHAIN_DEST: "/opt/riscv/riscv32-elf"
+  TOOLCHAIN_FILES_DIR: "/opt/riscv/cmake"
+
+supported_hosts:
+  - linux/amd64
+
+toolchains:
+  - ref: "toolchain.riscv-gnu.riscv32-unknown-elf@stable"
+    alias: TOOLCHAIN
+
+run_order:
+  - "00-system-base.yml"
+  - "10-toolchain.yml"
+  - "99-cleanup.yml"

@@ -1,0 +1,29 @@
+#
+# 99-cleanup.yml
+# Final cleanup and environment summary.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Print RISC-V 32-bit bare-metal environment summary"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  always_run: true
+  command: |
+    echo "=== Generic RISC-V 32-bit Bare-Metal Dev Environment Ready ==="
+    echo ""
+    echo "riscv32 toolchain:"
+    {{.Vars.TOOLCHAIN_DEST}}/bin/riscv32-unknown-elf-gcc --version | head -1
+    echo ""
+    echo "CMake toolchain: {{.Vars.TOOLCHAIN_FILES_DIR}}/riscv32-elf.cmake"
+    echo ""
+    echo "Quick start:"
+    echo "  cmake -DCMAKE_TOOLCHAIN_FILE={{.Vars.TOOLCHAIN_FILES_DIR}}/riscv32-elf.cmake -DCMAKE_BUILD_TYPE=Release -B build"
+    echo ""
+    echo "Targets: CH32V series, SiFive FE310, GD32VF103, ESP32-C3/C6 (RISC-V)"
+    echo ""
