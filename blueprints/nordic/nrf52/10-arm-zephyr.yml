@@ -2,6 +2,15 @@
 # 10-arm-zephyr.yml
 # Installs ARM GNU Embedded Toolchain and Zephyr SDK from catalog.
 #
+
+- name: "Create toolchain directories"
+  action: "run_command"
+  reason: "Ensure ARM and Zephyr SDK dest directories exist before unarchive steps."
+  command: |
+    mkdir -p {{.Vars.ARM_TOOLCHAIN_DEST}}
+    mkdir -p {{.Vars.ZEPHYR_SDK_DEST}}
+  creates: "{{.Vars.ARM_TOOLCHAIN_DEST}}"
+
 - name: "Install ARM GNU Embedded Toolchain"
   action: "unarchive_from_ref"
   ref: "toolchain.arm-gnu.arm-none-eabi@stable"

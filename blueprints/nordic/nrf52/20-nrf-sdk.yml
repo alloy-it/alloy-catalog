@@ -4,8 +4,7 @@
 #
 - name: "Clean up previous root pip installations"
   action: "run_command"
-  reason: "One-time migration: removes west installed system-wide or as root, which conflicts with user-scoped install via python_package."
-  run_as: "{{.Vars.DEV_USERNAME}}"
+  reason: "One-time migration: removes west installed system-wide or as root, which conflicts with user-scoped install via python_package. Must run as root to remove /root/.local files."
   command: |
     if [ -f /root/.local/bin/west ]; then
       rm -rf /root/.local/lib/python3*/site-packages/west*
@@ -51,6 +50,15 @@
     export PATH=$PATH:$HOME/.local/bin
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
+- name: "Create nRF Connect SDK directory"
+  action: "run_command"
+  reason: "Ensure NCS_BASE and NRF_TOOLS_DEST exist and NCS_BASE is owned by the dev user so subsequent chown -R after mcu_sdk allows run_as steps to access the SDK tree."
+  command: |
+    mkdir -p {{.Vars.NCS_BASE}}
+    mkdir -p {{.Vars.NRF_TOOLS_DEST}}
+    chown {{.Vars.DEV_USERNAME}}:{{.Vars.DEV_USERNAME}} {{.Vars.NCS_BASE}}
+  creates: "{{.Vars.NCS_BASE}}"
+
 - name: "Initialize nRF Connect SDK with West"
   action: "mcu_sdk"
   method: "west"
@@ -59,6 +67,14 @@
   dest: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
   run_as: "{{.Vars.DEV_USERNAME}}"
   creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/nrf"
+
+- name: "Recurse ownership of NCS directory to dev user"
+  action: "run_command"
+  reason: "mcu_sdk runs as root and creates the SDK tree; chown so run_as steps (zephyr-export, pip -r) can cd and write into the SDK directory."
+  command: |
+    chown -R {{.Vars.DEV_USERNAME}}:{{.Vars.DEV_USERNAME}} {{.Vars.NCS_BASE}}
+    touch {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.alloy_chown_done
+  creates: "{{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}/.alloy_chown_done"
 
 - name: "Export Zephyr CMake packages"
   action: "run_command"
@@ -102,6 +118,12 @@
     #!/bin/sh
     export PATH=$PATH:{{.Vars.NRF_TOOLS_DEST}}/bin
   mode: "USER_RWX GROUP_RX OTHER_RX"
+
+- name: "Create CMake presets directory"
+  action: "run_command"
+  reason: "Ensure /opt/nordic/cmake exists before writing toolchain files."
+  command: "mkdir -p /opt/nordic/cmake"
+  creates: "/opt/nordic/cmake"
 
 - name: "Create CMake toolchain file for nRF52840 DK"
   action: "write_env_file"

@@ -4,7 +4,7 @@
 # with nRF Connect SDK and Zephyr RTOS.
 #
 name: "Nordic nRF52 Dev Environment"
-version: "1.1.1"
+version: "1.1.2"
 description: "Provides the nRF Connect SDK, ARM toolchain, and development tools for nRF52 series."
 
 variables:
