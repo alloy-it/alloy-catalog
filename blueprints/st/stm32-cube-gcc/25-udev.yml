@@ -15,4 +15,4 @@
   reason: "udevadm control and trigger have no dedicated primitive; inline udev rules are written with write_env_file and must be reloaded separately."
   command: "udevadm control --reload-rules && udevadm trigger"
   always_run: true
-  skip_if: "[ \"$ALLOY_BACKEND\" = \"wsl2\" ]"
+  exclude: [docker, wsl2]
