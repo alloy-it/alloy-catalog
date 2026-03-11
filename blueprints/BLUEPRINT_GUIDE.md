@@ -153,7 +153,7 @@ DEBUG_MODE: "false"
 
 ### alloy.lock.yml (auto-generated)
 
-Created by `alloy-cicd resolve`. Pins every catalog reference to a concrete
+Created by `alloy-host resolve`. Pins every catalog reference to a concrete
 URL and SHA256 for a specific host platform. Never edit this file manually.
 
 ```yaml
