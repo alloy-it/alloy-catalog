@@ -3,10 +3,27 @@ id: sdk.nordic.nrf-connect-sdk
 type: index
 
 aliases:
-  latest: "2.9.0"
-  stable: "2.9.0"
+  latest: "3.4.0"
+  stable: "3.4.0"
+  lts: "2.9.0"
 
 versions:
+  - version: "3.4.0"
+    file: "3.4.0.yaml"
+    status: stable
+  - version: "3.3.4"
+    file: "3.3.4.yaml"
+    status: stable
+  - version: "3.2.4"
+    file: "3.2.4.yaml"
+    status: stable
+  - version: "3.2.0"
+    file: "3.2.0.yaml"
+    status: deprecated
+    replaced_by: "3.2.4"
+  - version: "3.3.0-preview2"
+    file: "3.3.0-preview2.yaml"
+    status: preview
   - version: "2.9.0"
     file: "2.9.0.yaml"
     status: stable

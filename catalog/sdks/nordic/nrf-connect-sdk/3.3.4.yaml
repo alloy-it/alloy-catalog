@@ -1,6 +1,6 @@
 spec_version: 1
 id: sdk.nordic.nrf-connect-sdk
-version: "3.2.0"
+version: "3.3.4"
 
 name: "nRF Connect SDK"
 homepage: "https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html"
@@ -22,26 +22,32 @@ providers:
     host_platforms:
       linux/amd64:
         url: "https://github.com/nrfconnect/sdk-nrf"
-        version: "v3.2.0"
+        version: "v3.3.4"
       linux/arm64:
         url: "https://github.com/nrfconnect/sdk-nrf"
-        version: "v3.2.0"
+        version: "v3.3.4"
 
 install_hints:
   creates: "nrf"
   requires_tool: "west"
   note: |
-    Use the mcu_sdk action with method: west. west must be installed first
-    (use a python_package task referencing tool.python.west).
-    After west update, run: west zephyr-export
-    Then install SDK Python requirements from:
-      nrf/scripts/requirements.txt
-      zephyr/scripts/requirements.txt
-      bootloader/mcuboot/scripts/requirements.txt
+    NCS 3.3.4 — Zephyr 4.x based. Includes nRF54L05 DK support (from 3.3.0 onward).
+    Python 3.12 required. Zephyr SDK 1.0.x recommended. West minimum 0.14.0. CMake minimum 3.28.0.
+  build_deps:
+    - git
+    - cmake
+    - ninja-build
+    - python3.12
+    - python3.12-venv
+    - python3.12-dev
+    - device-tree-compiler
   env_vars:
     ZEPHYR_BASE: "{dest}/zephyr"
+    PYTHON_MINOR: "3.12"
+    ZEPHYR_SDK_VERSION: "1.0.1"
+    PYTHON_APT_VERSION_jammy: "3.12.13-1+jammy1"
+    PYTHON_APT_VERSION_noble: "3.12.3-1ubuntu0.16"
 
 lifecycle:
-  status: deprecated
-  released_at: "2025-02-12"
-  replaced_by: "3.2.4"
+  status: stable
+  released_at: "2026-08-03"

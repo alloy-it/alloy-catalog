@@ -1,6 +1,8 @@
 # Nordic nRF52
 
-Development environment for Nordic nRF52 series (nRF52832, nRF52840, etc.) with nRF Connect SDK and Zephyr RTOS.
+Development environment for Nordic nRF52 series (nRF52832, nRF52840, etc.) with nRF Connect SDK v2.9.0.
+
+For newer NCS releases (3.2 / 3.3 / 3.4 with Python 3.12), use `nordic/nrf52-ncs-3.4`, `nrf52-ncs-3.3`, or `nrf52-ncs-3.2`.
 
 ## What this blueprint provides
 

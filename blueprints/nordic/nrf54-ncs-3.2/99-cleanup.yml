@@ -1,0 +1,35 @@
+#
+# 99-cleanup.yml — NCS 3.x blueprints (Python venv)
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Clean pip cache"
+  action: "run_command"
+  reason: "pip cache purge has no dedicated primitive; removing the pip download cache shrinks the final image."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  always_run: true
+  command: "{{.Vars.ZEPHYR_PYTHON_VENV}}/bin/pip cache purge || true"
+
+- name: "Print installed tool versions"
+  action: "run_command"
+  reason: "Printing a post-install version summary has no dedicated primitive; echo commands verify the environment is ready."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  always_run: true
+  command: |
+    export PATH={{.Vars.ZEPHYR_PYTHON_VENV}}/bin:$PATH
+    echo "=== {{.Vars.BLUEPRINT_TITLE}} Setup Complete ==="
+    echo ""
+    echo "Python: $({{.Vars.ZEPHYR_PYTHON_VENV}}/bin/python --version)"
+    echo "West: $(west --version)"
+    echo "nRF Connect SDK: {{.Vars.NCS_VERSION}} at {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
+    echo "Zephyr SDK: {{.Vars.ZEPHYR_SDK_DEST}}"
+    echo ""
+    echo "Quick start:"
+    echo "  cd {{.Vars.NCS_BASE}}/{{.Vars.NCS_VERSION}}"
+    echo "  west build -b <board> {{.Vars.SAMPLE_BUILD_HINT}}"

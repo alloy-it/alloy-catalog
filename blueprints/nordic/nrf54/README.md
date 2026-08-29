@@ -1,6 +1,8 @@
 # Nordic nRF54 Development Environment Blueprint
 
-This blueprint sets up a complete development environment for Nordic Semiconductor nRF54 series (nRF54H20, nRF54L15) on Linux hosts (amd64 and arm64). The nRF54 family is based on Arm Cortex-M33 and is supported by the nRF Connect SDK.
+This blueprint sets up a complete development environment for Nordic Semiconductor nRF54 series (nRF54H20, nRF54L15) on Linux hosts, pinned to **nRF Connect SDK v2.9.0**.
+
+For newer NCS releases (3.2 / 3.3 / 3.4 with Python 3.12), use `nordic/nrf54-ncs-3.4`, `nrf54-ncs-3.3`, or `nrf54-ncs-3.2`.
 
 ## What's Included
 

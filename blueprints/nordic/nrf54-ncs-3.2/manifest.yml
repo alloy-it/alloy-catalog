@@ -1,0 +1,43 @@
+# Alloy Blueprint: nrf54-ncs-3.2
+name: "Nordic nRF54 Dev Environment (NCS v3.2)"
+version: "1.0.0"
+description: "nRF Connect SDK 3.2.4, Zephyr SDK 1.0.1, Python 3.12."
+
+variables:
+  ARM_TOOLCHAIN_DEST: "/opt/arm-none-eabi"
+  ZEPHYR_SDK_DEST: "/opt/zephyr-sdk"
+  ZEPHYR_SDK_VERSION: "1.0.1"
+  NCS_VERSION: "v3.2.4"
+  NCS_URL: "https://github.com/nrfconnect/sdk-nrf"
+  NCS_BASE: "/opt/nordic/ncs"
+  WEST_VERSION: "1.3.0"
+  NRF_TOOLS_DEST: "/opt/nrf-command-line-tools"
+  PYTHON_MINOR: "3.12"
+  ZEPHYR_PYTHON_VENV: "/opt/zephyr/venv"
+  PYTHON_APT_VERSION_jammy: "3.12.13-1+jammy1"
+  PYTHON_APT_VERSION_noble: "3.12.3-1ubuntu0.16"
+  BLUEPRINT_TITLE: "Nordic nRF54 Dev Environment (NCS v3.2)"
+  SAMPLE_BUILD_HINT: "nrf/samples/hello_world"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+toolchains:
+  - ref: "toolchain.arm-gnu.arm-none-eabi@stable"
+    alias: ARM_TOOLCHAIN
+  - ref: "sdk.zephyr.zephyr-sdk@stable"
+    alias: ZEPHYR_SDK
+  - ref: "tool.nordic.nrf-command-line-tools@stable"
+    alias: NRF_TOOLS
+  - ref: "sdk.nordic.nrf-connect-sdk@3.2.4"
+    alias: NCS
+  - ref: "tool.python.west@stable"
+    alias: WEST
+
+run_order:
+  - "00-system-base.yml"
+  - "05-python.yml"
+  - "10-arm-zephyr.yml"
+  - "20-nrf-sdk.yml"
+  - "99-cleanup.yml"

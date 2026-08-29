@@ -1,6 +1,15 @@
 # Nordic nRF91 Development Environment Blueprint
 
-This blueprint sets up a complete development environment for Nordic Semiconductor nRF91 series (nRF9160, nRF9161) cellular IoT SoCs on Linux hosts (amd64 and arm64).
+This blueprint sets up a complete development environment for Nordic Semiconductor nRF91 series (nRF9160, nRF9161) cellular IoT SoCs on Linux hosts (amd64 and arm64), pinned to **nRF Connect SDK v2.9.0**.
+
+For newer NCS releases (3.2 / 3.3 / 3.4 with Python 3.12), use:
+
+| Blueprint | NCS version |
+| --------- | ----------- |
+| `nordic/nrf91-ncs-3.4` | v3.4.0 (recommended) |
+| `nordic/nrf91-ncs-3.3` | v3.3.4 |
+| `nordic/nrf91-ncs-3.2` | v3.2.4 |
+| `nordic/nrf91` | v2.9.0 (this blueprint) |
 
 ## What's Included
 

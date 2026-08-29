@@ -1,6 +1,6 @@
 spec_version: 1
 id: sdk.nordic.nrf-connect-sdk
-version: "2.9.0"
+version: "3.4.0"
 
 name: "nRF Connect SDK"
 homepage: "https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html"
@@ -22,32 +22,34 @@ providers:
     host_platforms:
       linux/amd64:
         url: "https://github.com/nrfconnect/sdk-nrf"
-        version: "v2.9.0"
+        version: "v3.4.0"
       linux/arm64:
         url: "https://github.com/nrfconnect/sdk-nrf"
-        version: "v2.9.0"
+        version: "v3.4.0"
 
 install_hints:
   creates: "nrf"
   requires_tool: "west"
   note: |
-    NCS 2.9.0 — Zephyr 3.x era. Use blueprint nordic/nrf91 (or nrf52/nrf54) with @2.9.0.
-    Python 3.10 required. Zephyr SDK 0.17.x or 1.0.x. West minimum 0.14.0. CMake minimum 3.20.5.
+    NCS 3.4.0 — Zephyr 4.x based (current stable line).
+    Python 3.12 required. Zephyr SDK 1.0.x recommended. West minimum 0.14.0. CMake minimum 3.28.0.
+    After west update run: west zephyr-export
+    Install Python requirements from zephyr, nrf, and mcuboot scripts/requirements.txt.
   build_deps:
     - git
     - cmake
     - ninja-build
-    - python3.10
-    - python3.10-venv
-    - python3.10-dev
+    - python3.12
+    - python3.12-venv
+    - python3.12-dev
     - device-tree-compiler
   env_vars:
     ZEPHYR_BASE: "{dest}/zephyr"
-    PYTHON_MINOR: "3.10"
-    ZEPHYR_SDK_VERSION: "0.17.4"
-    PYTHON_APT_VERSION_jammy: "3.10.12-1~22.04.17"
-    PYTHON_APT_VERSION_noble: "3.10.20-1+noble1"
+    PYTHON_MINOR: "3.12"
+    ZEPHYR_SDK_VERSION: "1.0.1"
+    PYTHON_APT_VERSION_jammy: "3.12.13-1+jammy1"
+    PYTHON_APT_VERSION_noble: "3.12.3-1ubuntu0.16"
 
 lifecycle:
   status: stable
-  released_at: "2024-10-15"
+  released_at: "2026-07-01"
