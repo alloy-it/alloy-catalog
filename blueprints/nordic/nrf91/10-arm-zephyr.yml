@@ -35,15 +35,15 @@
   action: "unarchive_from_ref"
   ref: "sdk.zephyr.zephyr-sdk@stable"
   dest: "{{.Vars.ZEPHYR_SDK_DEST}}"
-  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/setup.sh"
+  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-{{.Vars.ZEPHYR_SDK_VERSION}}/setup.sh"
   mode: "USER_RWX GROUP_RX OTHER_RX"
 
 - name: "Run Zephyr SDK setup"
   action: "run_command"
   reason: "The Zephyr SDK self-registration (setup.sh) invokes cmake and registers toolchain cmake files; no dedicated primitive covers post-extract SDK registration scripts."
   command: |
-    cd {{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-0.17.0 && ./setup.sh -t arm-zephyr-eabi -h -c
-  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-0.17.0/.setup_complete"
+    cd {{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-{{.Vars.ZEPHYR_SDK_VERSION}} && ./setup.sh -t arm-zephyr-eabi -h -c
+  creates: "{{.Vars.ZEPHYR_SDK_DEST}}/zephyr-sdk-{{.Vars.ZEPHYR_SDK_VERSION}}/.setup_complete"
 
 - name: "Add Zephyr SDK to environment"
   action: "write_env_file"
@@ -51,4 +51,5 @@
   content: |
     #!/bin/sh
     export ZEPHYR_SDK_INSTALL_DIR={{.Vars.ZEPHYR_SDK_DEST}}
+    export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
   mode: "USER_RWX GROUP_RX OTHER_RX"

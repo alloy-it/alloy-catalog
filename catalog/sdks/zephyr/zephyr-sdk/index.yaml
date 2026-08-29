@@ -3,10 +3,24 @@ id: sdk.zephyr.zephyr-sdk
 type: index
 
 aliases:
-  latest: "0.17.0"
-  stable: "0.17.0"
+  latest: "1.0.1"
+  stable: "1.0.1"
+  lts: "0.16.9"
 
 versions:
+  - version: "1.0.1"
+    file: "1.0.1.yaml"
+    status: stable
+  - version: "1.0.0"
+    file: "1.0.0.yaml"
+    status: stable
+  - version: "0.17.4"
+    file: "0.17.4.yaml"
+    status: stable
   - version: "0.17.0"
     file: "0.17.0.yaml"
+    status: deprecated
+    replaced_by: "0.17.4"
+  - version: "0.16.9"
+    file: "0.16.9.yaml"
     status: stable

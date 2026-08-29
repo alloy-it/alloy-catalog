@@ -1,6 +1,6 @@
 spec_version: 1
 id: sdk.zephyr.zephyr-sdk
-version: "0.17.0"
+version: "0.17.4"
 
 name: "Zephyr SDK"
 homepage: "https://github.com/zephyrproject-rtos/sdk-ng"
@@ -23,17 +23,19 @@ providers:
     method: archive
     host_platforms:
       linux/amd64:
-        url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-x86_64.tar.xz"
-        sha256: "e7536b4879f689cfd4ef9c1939069da6c4cf0e3030a2940175d6354e7b8b69e1"
+        url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.4/zephyr-sdk-0.17.4_linux-x86_64.tar.xz"
+        sha256: "83f2f327dba2d6cf2440f22f2f501041544d7f34ef8b878ecd83f4513d1116b6"
       linux/arm64:
-        url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/zephyr-sdk-0.17.0_linux-aarch64.tar.xz"
-        sha256: "d822b4336d5a66ad70077321cde92ca3580b235fd23326cd4fb00bdc16784483"
+        url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.4/zephyr-sdk-0.17.4_linux-aarch64.tar.xz"
+        sha256: "14ed90e95a74316685c01d3ed7023646d99d69311e198a8e6930bc0ceacb8db9"
 
 install_hints:
-  creates: "zephyr-sdk-0.17.0/setup.sh"
+  creates: "zephyr-sdk-0.17.4/setup.sh"
   note: |
-    Deprecated — use 0.17.4 instead.
-    Compatible with Zephyr 4.2.x and 4.3.x. Python 3.10 required. CMake minimum 3.20.5.
+    Compatible with Zephyr 4.2.x and 4.3.x.
+    Bundle variant: legacy (no _gnu suffix).
+    Python 3.10 required (GDB in SDK links against Python 3.10). Use a dedicated venv.
+    CMake minimum 3.20.5. West minimum 0.14.0.
   build_deps:
     - git
     - cmake
@@ -50,6 +52,5 @@ install_hints:
     PYTHON_APT_VERSION_noble: "3.10.20-1+noble1"
 
 lifecycle:
-  status: deprecated
-  released_at: "2024-10-20"
-  replaced_by: "0.17.4"
+  status: stable
+  released_at: "2025-08-15"

@@ -1,0 +1,57 @@
+spec_version: 1
+id: sdk.zephyr.zephyr-sdk
+version: "1.0.1"
+
+name: "Zephyr SDK"
+homepage: "https://github.com/zephyrproject-rtos/sdk-ng"
+license: "Apache-2.0"
+
+capabilities:
+  - sdk.zephyr
+  - target.rtos
+  - target.arm
+  - target.riscv
+  - target.x86
+  - target.xtensa
+  - target.arc
+  - target.mips
+  - target.sparc
+  - toolchain.gcc
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v1.0.1/zephyr-sdk-1.0.1_linux-x86_64_gnu.tar.xz"
+        sha256: "37a8c5b5569c2b482d39099c65fe3ddac4e43524996c731907e1e9f5818cbba7"
+      linux/arm64:
+        url: "https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v1.0.1/zephyr-sdk-1.0.1_linux-aarch64_gnu.tar.xz"
+        sha256: "6e38018f70af5e90c18cc04c2f8ac5a91c99f5559b25692d1b0de328c3edb88a"
+
+install_hints:
+  creates: "zephyr-sdk-1.0.1/setup.sh"
+  note: |
+    Compatible with Zephyr 4.4.x and main.
+    Bundle variant: gnu (host tools + GNU toolchains).
+    Python 3.12 required (Zephyr 4.4+ minimum). Use a dedicated venv; Ubuntu 22.04
+    defaults to Python 3.10 and must install python3.12 explicitly.
+    CMake minimum 3.28.0. West minimum 0.14.0.
+  build_deps:
+    - git
+    - cmake
+    - ninja-build
+    - python3.12
+    - python3.12-venv
+    - python3.12-dev
+    - device-tree-compiler
+  env_vars:
+    ZEPHYR_SDK_INSTALL_DIR: "/opt/zephyr-sdk"
+    ZEPHYR_TOOLCHAIN_VARIANT: "zephyr"
+    PYTHON_MINOR: "3.12"
+    PYTHON_APT_VERSION_jammy: "3.12.13-1+jammy1"
+    PYTHON_APT_VERSION_noble: "3.12.3-1ubuntu0.16"
+
+lifecycle:
+  status: stable
+  released_at: "2026-03-23"

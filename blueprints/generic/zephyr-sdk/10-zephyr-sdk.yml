@@ -1,0 +1,25 @@
+#
+# 10-zephyr-sdk.yml
+# Download the Zephyr GNU SDK bundle and run setup.sh per upstream docs.
+#
+- name: "Create Zephyr SDK install directory"
+  action: "run_command"
+  reason: "mkdir has no dedicated primitive; ensure the SDK parent directory exists before extraction."
+  command: "mkdir -p {{.Vars.ZEPHYR_SDK_INSTALL_DIR}}"
+  creates: "{{.Vars.ZEPHYR_SDK_INSTALL_DIR}}"
+
+- name: "Install Zephyr SDK GNU bundle"
+  action: "unarchive_from_ref"
+  ref: "sdk.zephyr.zephyr-sdk@stable"
+  dest: "{{.Vars.ZEPHYR_SDK_INSTALL_DIR}}"
+  creates: "{{.Vars.ZEPHYR_SDK_INSTALL_DIR}}/zephyr-sdk-{{.Vars.ZEPHYR_SDK_VERSION}}/setup.sh"
+  mode: "USER_RWX GROUP_RX OTHER_RX"
+
+- name: "Run Zephyr SDK setup"
+  action: "run_command"
+  reason: "setup.sh registers toolchain CMake packages and installs host tools (QEMU, OpenOCD); no dedicated primitive covers SDK post-install registration."
+  command: |
+    set -e
+    cd {{.Vars.ZEPHYR_SDK_INSTALL_DIR}}/zephyr-sdk-{{.Vars.ZEPHYR_SDK_VERSION}}
+    ./setup.sh -t {{.Vars.ZEPHYR_SDK_TOOLCHAINS}} -h -c
+  creates: "{{.Vars.ZEPHYR_SDK_INSTALL_DIR}}/zephyr-sdk-{{.Vars.ZEPHYR_SDK_VERSION}}/.setup_complete"

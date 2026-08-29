@@ -5,6 +5,7 @@ Board-agnostic Zephyr RTOS development environment with Zephyr SDK and west.
 ## What this blueprint provides
 
 - Zephyr SDK (toolchains and CMake integration) with ARM target installed
+- Python pinned to the SDK-required version (**3.12** for SDK 1.0.x, **3.10** for 0.17.x/0.16.x) with an isolated venv
 - west (Zephyr meta-tool) for workspace and build management
 
 ## Usage

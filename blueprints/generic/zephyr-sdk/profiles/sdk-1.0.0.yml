@@ -1,0 +1,8 @@
+# Variable profile: Zephyr SDK 1.0.0 (Zephyr 4.4.x)
+#
+# Merge into manifest.yml variables: and set toolchains ref to sdk.zephyr.zephyr-sdk@1.0.0
+#
+ZEPHYR_SDK_VERSION: "1.0.0"
+PYTHON_MINOR: "3.12"
+PYTHON_APT_VERSION_jammy: "3.12.13-1+jammy1"
+PYTHON_APT_VERSION_noble: "3.12.3-1ubuntu0.16"

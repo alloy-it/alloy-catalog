@@ -17,6 +17,7 @@ description: "Provides the nRF Connect SDK, ARM toolchain, and development tools
 variables:
   ARM_TOOLCHAIN_DEST: "/opt/arm-none-eabi"
   ZEPHYR_SDK_DEST: "/opt/zephyr-sdk"
+  ZEPHYR_SDK_VERSION: "1.0.1"
   NCS_VERSION: "v2.9.0"      # resolved from sdk.nordic.nrf-connect-sdk@stable
   NCS_URL: "https://github.com/nrfconnect/sdk-nrf"  # resolved from sdk.nordic.nrf-connect-sdk@stable
   NCS_BASE: "/opt/nordic/ncs"

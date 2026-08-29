@@ -1,15 +1,17 @@
-# Alloy Blueprint: generic/zephyr
+# Alloy Blueprint: generic/zephyr-sdk
 #
-# Board-agnostic Zephyr RTOS SDK and west for any Zephyr-supported target.
+# Zephyr SDK environment per official installation guide:
+# https://docs.zephyrproject.org/latest/develop/toolchains/zephyr_sdk.html
 #
-name: "Generic Zephyr RTOS Dev Environment"
+name: "Zephyr SDK Dev Environment"
 version: "1.0.0"
-description: "Zephyr SDK and west for board-agnostic Zephyr development."
+description: "Zephyr SDK GNU bundle with host tools, CMake registration, and OpenOCD udev rules."
 
 variables:
-  ZEPHYR_SDK_DEST: "/opt/zephyr-sdk"
+  ZEPHYR_SDK_INSTALL_DIR: "/opt/zephyr-sdk"
   ZEPHYR_SDK_VERSION: "1.0.1"
-  WEST_VERSION: "1.3.0"
+  # Space-separated toolchain IDs passed to setup.sh -t (see sdk-ng release notes).
+  ZEPHYR_SDK_TOOLCHAINS: "arm-zephyr-eabi"
   # Python deps for SDK 1.0.1 / Zephyr 4.4+ — see profiles/ for other SDK versions.
   PYTHON_MINOR: "3.12"
   ZEPHYR_PYTHON_VENV: "/opt/zephyr/venv"
@@ -28,5 +30,6 @@ run_order:
   - "00-system-base.yml"
   - "05-python.yml"
   - "10-zephyr-sdk.yml"
-  - "20-west.yml"
+  - "20-environment.yml"
+  - "25-udev.yml"
   - "99-cleanup.yml"

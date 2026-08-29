@@ -1,0 +1,21 @@
+#
+# 25-udev.yml
+# udev rules for flashing Zephyr boards via OpenOCD (Linux hosts).
+#
+- name: "Install OpenOCD udev rules from Zephyr SDK"
+  action: "run_command"
+  reason: "OpenOCD udev rules ship inside the SDK hosttools tree; copy path varies by host arch so find is used."
+  command: |
+    set -e
+    RULES=$(find {{.Vars.ZEPHYR_SDK_INSTALL_DIR}}/zephyr-sdk-{{.Vars.ZEPHYR_SDK_VERSION}}/hosttools -name '60-openocd.rules' -print -quit)
+    test -n "$RULES"
+    install -m 0644 "$RULES" /etc/udev/rules.d/60-openocd.rules
+  creates: "/etc/udev/rules.d/60-openocd.rules"
+  exclude: [docker, wsl2]
+
+- name: "Reload udev rules"
+  action: "run_command"
+  reason: "udevadm control and trigger have no dedicated primitive; rules must be reloaded after install."
+  command: "udevadm control --reload-rules && udevadm trigger"
+  always_run: true
+  exclude: [docker, wsl2]
