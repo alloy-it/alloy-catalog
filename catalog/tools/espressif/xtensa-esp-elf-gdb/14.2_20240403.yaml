@@ -1,0 +1,31 @@
+spec_version: 1
+id: tool.espressif.xtensa-esp-elf-gdb
+version: "14.2_20240403"
+
+name: "GDB for Xtensa ESP32"
+homepage: "https://github.com/espressif/binutils-gdb"
+license: "GPL-3.0-or-later"
+
+capabilities:
+  - tool.debug
+  - target.xtensa-esp32
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/espressif/binutils-gdb/releases/download/esp-gdb-v14.2_20240403/xtensa-esp-elf-gdb-14.2_20240403-x86_64-linux-gnu.tar.gz"
+        sha256: "9d68472d4cba5cf8c2b79d94f86f92c828e76a632bd1e6be5e7706e5b304d36e"
+      linux/arm64:
+        url: "https://github.com/espressif/binutils-gdb/releases/download/esp-gdb-v14.2_20240403/xtensa-esp-elf-gdb-14.2_20240403-aarch64-linux-gnu.tar.gz"
+        sha256: "bdabc3217994815fc311c4e16e588b78f6596b5ad4ffa46c80b40e982cfb1e66"
+
+install_hints:
+  note: |
+    ESP-IDF tool "xtensa-esp-elf-gdb" 14.2_20240403 (pinned by ESP-IDF v5.4.x tools/tools.json).
+    For idf_tools.py to find it, extract without strip into:
+      $IDF_TOOLS_PATH/tools/xtensa-esp-elf-gdb/14.2_20240403
+
+lifecycle:
+  status: stable

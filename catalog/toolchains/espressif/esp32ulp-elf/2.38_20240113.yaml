@@ -1,0 +1,31 @@
+spec_version: 1
+id: toolchain.espressif.esp32ulp-elf
+version: "2.38_20240113"
+
+name: "ESP32 ULP FSM binutils"
+homepage: "https://github.com/espressif/binutils-gdb"
+license: "GPL-3.0-or-later"
+
+capabilities:
+  - toolchain.binutils
+  - target.esp32-ulp
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/espressif/binutils-gdb/releases/download/esp32ulp-elf-2.38_20240113/esp32ulp-elf-2.38_20240113-linux-amd64.tar.gz"
+        sha256: "d13a808365b78465fa6591636dfbbb9604d9d15a397c3d9cd22626d54828ac2c"
+      linux/arm64:
+        url: "https://github.com/espressif/binutils-gdb/releases/download/esp32ulp-elf-2.38_20240113/esp32ulp-elf-2.38_20240113-linux-arm64.tar.gz"
+        sha256: "ecce0788ce1000e5c669c5adaf2fd5bf7f9bf96dcdbd3555d1d9ce4dcb311038"
+
+install_hints:
+  note: |
+    ESP-IDF tool "esp32ulp-elf" 2.38_20240113 (pinned by ESP-IDF v5.4.x tools/tools.json).
+    For idf_tools.py to find it, extract without strip into:
+      $IDF_TOOLS_PATH/tools/esp32ulp-elf/2.38_20240113
+
+lifecycle:
+  status: stable

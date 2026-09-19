@@ -1,0 +1,10 @@
+spec_version: 1
+id: toolchain.espressif.riscv32-esp-elf
+type: index
+aliases:
+    latest: 14.2.0_20241119
+    stable: 14.2.0_20241119
+versions:
+    - version: 14.2.0_20241119
+      file: 14.2.0_20241119.yaml
+      status: stable

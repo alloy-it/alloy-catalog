@@ -1,0 +1,10 @@
+spec_version: 1
+id: tool.espressif.xtensa-esp-elf-gdb
+type: index
+aliases:
+    latest: 14.2_20240403
+    stable: 14.2_20240403
+versions:
+    - version: 14.2_20240403
+      file: 14.2_20240403.yaml
+      status: stable

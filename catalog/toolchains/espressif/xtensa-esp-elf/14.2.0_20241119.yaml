@@ -1,0 +1,31 @@
+spec_version: 1
+id: toolchain.espressif.xtensa-esp-elf
+version: "14.2.0_20241119"
+
+name: "Xtensa ESP32 GCC (Espressif crosstool-NG)"
+homepage: "https://github.com/espressif/crosstool-NG"
+license: "GPL-3.0-with-GCC-exception"
+
+capabilities:
+  - toolchain.gcc
+  - target.xtensa-esp32
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/espressif/crosstool-NG/releases/download/esp-14.2.0_20241119/xtensa-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz"
+        sha256: "e3e6dcf3d275c3c9ab0e4c8a9d93fd10e7efc035d435460576c9d95b4140c676"
+      linux/arm64:
+        url: "https://github.com/espressif/crosstool-NG/releases/download/esp-14.2.0_20241119/xtensa-esp-elf-14.2.0_20241119-aarch64-linux-gnu.tar.xz"
+        sha256: "ac2b311dc0003386425086bfc813bf2aeb3cdf3b117845802df6ebef5f69955f"
+
+install_hints:
+  note: |
+    ESP-IDF tool "xtensa-esp-elf" esp-14.2.0_20241119 (pinned by ESP-IDF v5.4.x tools/tools.json).
+    For idf_tools.py to find it, extract without strip into:
+      $IDF_TOOLS_PATH/tools/xtensa-esp-elf/esp-14.2.0_20241119
+
+lifecycle:
+  status: stable

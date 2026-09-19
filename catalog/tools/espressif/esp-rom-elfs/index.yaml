@@ -1,0 +1,10 @@
+spec_version: 1
+id: tool.espressif.esp-rom-elfs
+type: index
+aliases:
+    latest: 20241011
+    stable: 20241011
+versions:
+    - version: 20241011
+      file: 20241011.yaml
+      status: stable

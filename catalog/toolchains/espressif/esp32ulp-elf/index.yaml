@@ -1,0 +1,10 @@
+spec_version: 1
+id: toolchain.espressif.esp32ulp-elf
+type: index
+aliases:
+    latest: 2.38_20240113
+    stable: 2.38_20240113
+versions:
+    - version: 2.38_20240113
+      file: 2.38_20240113.yaml
+      status: stable

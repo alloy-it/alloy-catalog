@@ -1,0 +1,17 @@
+#
+# 20-env.yml
+# Make idf.py usable in every login shell, targeting esp32s3 by default.
+#
+- name: "Add ESP-IDF environment to profile"
+  action: "write_env_file"
+  file: "/etc/profile.d/30-esp-idf.sh"
+  content: |
+    #!/bin/sh
+    export IDF_PATH={{.Vars.IDF_DEST}}
+    export IDF_TOOLS_PATH={{.Vars.IDF_TOOLS_PATH}}
+    # Default chip for new projects (idf.py set-target still overrides per project)
+    export IDF_TARGET={{.Vars.IDF_TARGET}}
+    if [ -f "$IDF_PATH/export.sh" ]; then
+      . "$IDF_PATH/export.sh" >/dev/null 2>&1 || echo "alloy: ESP-IDF export failed; run '. $IDF_PATH/export.sh' to see why" >&2
+    fi
+  mode: "USER_RWX GROUP_RX OTHER_RX"

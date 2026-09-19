@@ -1,0 +1,10 @@
+spec_version: 1
+id: tool.espressif.openocd-esp32
+type: index
+aliases:
+    latest: 0.12.0-esp32-20241016
+    stable: 0.12.0-esp32-20241016
+versions:
+    - version: 0.12.0-esp32-20241016
+      file: 0.12.0-esp32-20241016.yaml
+      status: stable

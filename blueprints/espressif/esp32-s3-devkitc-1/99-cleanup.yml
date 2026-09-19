@@ -1,0 +1,29 @@
+#
+# 99-cleanup.yml
+# Cleanup and a real smoke test run as the dev user.
+#
+- name: "Clean APT cache"
+  action: "run_command"
+  reason: "apt-get clean has no dedicated primitive; removing package lists shrinks the final image."
+  always_run: true
+  command: |
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+- name: "Verify ESP32-S3 toolchain as dev user"
+  action: "run_command"
+  reason: "Post-install smoke test has no dedicated primitive; runs the tools through the login profile to prove the dev user can use them."
+  run_as: "{{.Vars.DEV_USERNAME}}"
+  always_run: true
+  command: |
+    bash -lc '
+      set -e
+      echo "=== Espressif ESP32-S3-DevKitC-1 Dev Environment ==="
+      idf.py --version
+      xtensa-esp32s3-elf-gcc --version | head -1
+      openocd --version 2>&1 | head -1
+      echo ""
+      echo "Try: cp -r $IDF_PATH/examples/get-started/blink ~/blink && cd ~/blink && idf.py build"
+      echo "Flash via UART port:  idf.py -p /dev/ttyUSB0 flash monitor"
+      echo "Flash via USB port:   idf.py -p /dev/ttyACM0 flash monitor"
+    '

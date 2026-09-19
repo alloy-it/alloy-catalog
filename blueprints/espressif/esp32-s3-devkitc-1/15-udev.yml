@@ -1,0 +1,24 @@
+#
+# 15-udev.yml
+# The DevKitC-1 has two USB-C ports:
+#   "UART" port -> CP2102N USB-to-UART bridge (/dev/ttyUSB*)
+#   "USB"  port -> ESP32-S3 native USB-Serial/JTAG (/dev/ttyACM*, also OpenOCD)
+#
+- name: "Configure udev rules for ESP32-S3-DevKitC-1"
+  action: "write_env_file"
+  file: "/etc/udev/rules.d/99-esp32s3-devkitc.rules"
+  content: |
+    # SiLabs CP210x USB-to-UART bridge ("UART" port)
+    SUBSYSTEM=="usb", ATTR{idVendor}=="10c4", ATTR{idProduct}=="ea60", MODE="0666", GROUP="plugdev"
+    # WCH CH343 USB-to-UART bridge (fitted on some board revisions)
+    SUBSYSTEM=="usb", ATTR{idVendor}=="1a86", MODE="0666", GROUP="plugdev"
+    # Espressif native USB ("USB" port): USB-Serial/JTAG 303a:1001 (OpenOCD), DFU, TinyUSB apps
+    SUBSYSTEM=="usb", ATTR{idVendor}=="303a", MODE="0666", GROUP="plugdev"
+  mode: "USER_RW GROUP_R OTHER_R"
+
+- name: "Reload udev rules"
+  action: "run_command"
+  reason: "udevadm control and trigger have no dedicated primitive; inline udev rules are written with write_env_file and must be reloaded separately."
+  command: "udevadm control --reload-rules && udevadm trigger"
+  always_run: true
+  exclude: [docker, wsl2]

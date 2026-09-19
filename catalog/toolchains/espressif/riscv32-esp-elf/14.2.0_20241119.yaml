@@ -1,0 +1,32 @@
+spec_version: 1
+id: toolchain.espressif.riscv32-esp-elf
+version: "14.2.0_20241119"
+
+name: "RISC-V ESP32 GCC (Espressif crosstool-NG)"
+homepage: "https://github.com/espressif/crosstool-NG"
+license: "GPL-3.0-with-GCC-exception"
+
+capabilities:
+  - toolchain.gcc
+  - target.riscv32
+  - target.esp32s3-ulp
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/espressif/crosstool-NG/releases/download/esp-14.2.0_20241119/riscv32-esp-elf-14.2.0_20241119-x86_64-linux-gnu.tar.xz"
+        sha256: "7faaa86d272f3e43c233f8a5ffeba327673224a752c2eb72394655d5e7950000"
+      linux/arm64:
+        url: "https://github.com/espressif/crosstool-NG/releases/download/esp-14.2.0_20241119/riscv32-esp-elf-14.2.0_20241119-aarch64-linux-gnu.tar.xz"
+        sha256: "762eac9ee3d909cf806dcbd26feeb4a83061640d1afea39bc36efdb566b77b03"
+
+install_hints:
+  note: |
+    ESP-IDF tool "riscv32-esp-elf" esp-14.2.0_20241119 (pinned by ESP-IDF v5.4.x tools/tools.json).
+    For idf_tools.py to find it, extract without strip into:
+      $IDF_TOOLS_PATH/tools/riscv32-esp-elf/esp-14.2.0_20241119
+
+lifecycle:
+  status: stable

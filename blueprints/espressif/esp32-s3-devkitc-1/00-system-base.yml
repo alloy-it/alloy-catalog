@@ -1,0 +1,62 @@
+#
+# 00-system-base.yml
+# ESP-IDF Linux prerequisites plus serial/USB tooling for the DevKitC-1.
+#
+# Distro packages are deliberately NOT version-pinned: exact apt pins break as soon
+# as Ubuntu publishes a security update. ESP-IDF v5.4.1 only needs minimums
+# (Python >= 3.8, CMake >= 3.16), enforced below. Known-good:
+#   Ubuntu 22.04 (Alloy VM default): Python 3.10, CMake 3.22
+#   Ubuntu 24.04:                    Python 3.12, CMake 3.28
+# Python packages are pinned by Espressif's constraints file via idf_tools.py.
+#
+- name: "Update APT cache"
+  action: "run_command"
+  reason: "apt-get update has no dedicated primitive; must run before any apt_install step."
+  command: "apt-get update -y"
+  always_run: true
+
+- name: "Install ESP-IDF prerequisites"
+  action: "apt_install"
+  packages:
+    - "git"
+    - "wget"
+    - "curl"
+    - "flex"
+    - "bison"
+    - "gperf"
+    - "python3"
+    - "python3-pip"
+    - "python3-venv"
+    - "cmake"
+    - "ninja-build"
+    - "ccache"
+    - "libffi-dev"
+    - "libssl-dev"
+    - "dfu-util"
+    - "libusb-1.0-0"
+    - "ca-certificates"
+
+- name: "Check Python and CMake meet ESP-IDF v5.4.1 minimums"
+  action: "run_command"
+  reason: "Version-minimum checks have no dedicated primitive; fails fast before the long toolchain downloads."
+  always_run: true
+  command: |
+    set -e
+    python3 -c 'import sys; sys.exit(sys.version_info < (3, 8))' \
+      || { echo "ESP-IDF v5.4.1 needs Python >= 3.8, found $(python3 --version)" >&2; exit 1; }
+    CMAKE_VER=$(cmake --version | head -1 | awk '{print $3}')
+    dpkg --compare-versions "$CMAKE_VER" ge 3.16 \
+      || { echo "ESP-IDF v5.4.1 needs CMake >= 3.16, found $CMAKE_VER" >&2; exit 1; }
+    echo "OK: $(python3 --version), CMake $CMAKE_VER"
+
+- name: "Install USB and serial tools"
+  action: "apt_install"
+  packages:
+    - "usbutils"
+    - "picocom"
+
+- name: "Grant dev user access to serial and USB devices"
+  action: "run_command"
+  reason: "Group membership changes have no dedicated primitive; usermod is the standard approach."
+  command: "usermod -aG dialout,plugdev {{.Vars.DEV_USERNAME}}"
+  skip_if: "id -nG {{.Vars.DEV_USERNAME}} | grep -qw dialout"

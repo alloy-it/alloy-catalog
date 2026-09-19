@@ -1,0 +1,55 @@
+# Alloy Blueprint: espressif/esp32-s3-devkitc-1
+#
+# ESP-IDF environment for the ESP32-S3-DevKitC-1 (ESP32-S3-WROOM-1/1U module).
+# Installs only the esp32s3 toolchain (Xtensa GCC, RISC-V ULP GCC, OpenOCD, GDB).
+#
+name: "Espressif ESP32-S3-DevKitC-1 Dev Environment"
+version: "1.0.0"
+description: "ESP-IDF v5.4.1 with the ESP32-S3 toolchain, OpenOCD for built-in USB-JTAG, and udev rules for both DevKitC-1 USB ports."
+vendor: "Espressif Systems"
+licenses: "Apache-2.0"
+
+variables:
+  IDF_VERSION: "v5.4.1"
+  IDF_URL: "https://github.com/espressif/esp-idf.git"
+  IDF_DEST: "/opt/esp-idf"
+  # Shared tools dir instead of the default ~/.espressif: install runs as root,
+  # so the default would land in /root and be invisible to the dev user.
+  IDF_TOOLS_PATH: "/opt/espressif"
+  IDF_TARGET: "esp32s3"
+
+  # Tool dir names exactly as ESP-IDF v5.4.1 tools/tools.json expects them under
+  # $IDF_TOOLS_PATH/tools/<tool>/<version>. Must match the catalog refs below.
+  XTENSA_GCC_VER: "esp-14.2.0_20241119"
+  RISCV_GCC_VER: "esp-14.2.0_20241119"
+  ULP_BINUTILS_VER: "2.38_20240113"
+  XTENSA_GDB_VER: "14.2_20240403"
+  OPENOCD_VER: "v0.12.0-esp32-20241016"
+  ROM_ELFS_VER: "20241011"
+
+supported_hosts:
+  - linux/amd64
+  - linux/arm64
+
+# Per-host URL/SHA256 (linux/amd64 vs linux/arm64) are resolved from the catalog
+# into alloy.lock.yml. Versions are pinned exactly: ESP-IDF rejects any other.
+toolchains:
+  - ref: "toolchain.espressif.xtensa-esp-elf@14.2.0_20241119"
+    alias: XTENSA_GCC
+  - ref: "toolchain.espressif.riscv32-esp-elf@14.2.0_20241119"
+    alias: RISCV_GCC
+  - ref: "toolchain.espressif.esp32ulp-elf@2.38_20240113"
+    alias: ULP_BINUTILS
+  - ref: "tool.espressif.xtensa-esp-elf-gdb@14.2_20240403"
+    alias: XTENSA_GDB
+  - ref: "tool.espressif.openocd-esp32@0.12.0-esp32-20241016"
+    alias: OPENOCD
+  - ref: "tool.espressif.esp-rom-elfs@20241011"
+    alias: ROM_ELFS
+
+run_order:
+  - "00-system-base.yml"
+  - "10-esp-idf.yml"
+  - "15-udev.yml"
+  - "20-env.yml"
+  - "99-cleanup.yml"

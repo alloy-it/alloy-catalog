@@ -1,0 +1,31 @@
+spec_version: 1
+id: tool.espressif.esp-rom-elfs
+version: "20241011"
+
+name: "ESP ROM ELF files (for GDB/panic decoding)"
+homepage: "https://github.com/espressif/esp-rom-elfs"
+license: "Apache-2.0"
+
+capabilities:
+  - tool.debug
+  - target.esp32
+
+providers:
+  - id: archive
+    method: archive
+    host_platforms:
+      linux/amd64:
+        url: "https://github.com/espressif/esp-rom-elfs/releases/download/20241011/esp-rom-elfs-20241011.tar.gz"
+        sha256: "921f000164a421c7628fbfee55b173384aafaa51883adc65cd27bf9b0af9e9a9"
+      linux/arm64:
+        url: "https://github.com/espressif/esp-rom-elfs/releases/download/20241011/esp-rom-elfs-20241011.tar.gz"
+        sha256: "921f000164a421c7628fbfee55b173384aafaa51883adc65cd27bf9b0af9e9a9"
+
+install_hints:
+  note: |
+    ESP-IDF tool "esp-rom-elfs" 20241011 (pinned by ESP-IDF v5.4.x tools/tools.json).
+    For idf_tools.py to find it, extract without strip into:
+      $IDF_TOOLS_PATH/tools/esp-rom-elfs/20241011
+
+lifecycle:
+  status: stable

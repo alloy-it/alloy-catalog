@@ -8,3 +8,6 @@ versions:
     - version: 15.2.0_20251204
       file: 15.2.0_20251204.yaml
       status: stable
+    - version: 14.2.0_20241119
+      file: 14.2.0_20241119.yaml
+      status: stable
