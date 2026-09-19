@@ -58,5 +58,9 @@
   command: |
     set -e
     IDF_TOOLS_PATH={{.Vars.IDF_TOOLS_PATH}} python3 {{.Vars.IDF_DEST}}/tools/idf_tools.py install-python-env
+    # Record esp32s3 as the only target in idf-env.json. Without it export.sh
+    # requires the tools of every chip (e.g. riscv32-esp-elf-gdb) and fails.
+    # The catalog tools above are already in place, so nothing is downloaded.
+    IDF_TOOLS_PATH={{.Vars.IDF_TOOLS_PATH}} python3 {{.Vars.IDF_DEST}}/tools/idf_tools.py --non-interactive install --targets={{.Vars.IDF_TARGET}}
     chown -R {{.Vars.DEV_USERNAME}} {{.Vars.IDF_TOOLS_PATH}}
   creates: "{{.Vars.IDF_TOOLS_PATH}}/python_env"

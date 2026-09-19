@@ -16,10 +16,10 @@ Debian/Ubuntu (uses `apt`). ESP-IDF v5.4.1 needs Python ≥ 3.8 and CMake ≥ 3.
 
 ## The two USB ports
 
-| Port on board | Chip | Linux device | Use for |
-|---|---|---|---|
-| **UART** | CP2102N (`10c4:ea60`) | `/dev/ttyUSB0` | Flashing + console; works even if the firmware disables native USB |
-| **USB** | ESP32-S3 native USB-Serial/JTAG (`303a:1001`) | `/dev/ttyACM0` | Flashing, console **and** JTAG debugging with no external probe |
+| Port on board | Chip                                          | Linux device   | Use for                                                            |
+| ------------- | --------------------------------------------- | -------------- | ------------------------------------------------------------------ |
+| **UART**      | CP2102N (`10c4:ea60`)                         | `/dev/ttyUSB0` | Flashing + console; works even if the firmware disables native USB |
+| **USB**       | ESP32-S3 native USB-Serial/JTAG (`303a:1001`) | `/dev/ttyACM0` | Flashing, console **and** JTAG debugging with no external probe    |
 
 Forward whichever port you use into the VM (see USB passthrough in Alloy Host).
 
@@ -42,13 +42,13 @@ The on-board RGB LED is a WS2812 on GPIO48 (GPIO38 on board v1.1). Set the pin w
 
 ## Variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `IDF_VERSION` | `v5.4.1` | ESP-IDF git tag |
-| `IDF_URL` | `https://github.com/espressif/esp-idf.git` | ESP-IDF repo |
-| `IDF_DEST` | `/opt/esp-idf` | ESP-IDF checkout |
-| `IDF_TOOLS_PATH` | `/opt/espressif` | Toolchains + Python env |
-| `IDF_TARGET` | `esp32s3` | Chip passed to `install.sh` and default target |
+| Variable         | Default                                    | Description                                    |
+| ---------------- | ------------------------------------------ | ---------------------------------------------- |
+| `IDF_VERSION`    | `v5.4.1`                                   | ESP-IDF git tag                                |
+| `IDF_URL`        | `https://github.com/espressif/esp-idf.git` | ESP-IDF repo                                   |
+| `IDF_DEST`       | `/opt/esp-idf`                             | ESP-IDF checkout                               |
+| `IDF_TOOLS_PATH` | `/opt/espressif`                           | Toolchains + Python env                        |
+| `IDF_TARGET`     | `esp32s3`                                  | Chip passed to `install.sh` and default target |
 
 ## Upgrading ESP-IDF
 

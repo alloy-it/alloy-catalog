@@ -22,8 +22,8 @@ idf.py -p /dev/ttyUSB0 flash monitor
 
 ## Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `IDF_DEST` | `/opt/esp-idf` | ESP-IDF install path |
-| `IDF_VERSION` | `v5.4.1` | Git tag or branch |
-| `IDF_URL` | `https://github.com/espressif/esp-idf.git` | ESP-IDF repo URL |
+| Variable      | Default                                    | Description          |
+| ------------- | ------------------------------------------ | -------------------- |
+| `IDF_DEST`    | `/opt/esp-idf`                             | ESP-IDF install path |
+| `IDF_VERSION` | `v5.4.1`                                   | Git tag or branch    |
+| `IDF_URL`     | `https://github.com/espressif/esp-idf.git` | ESP-IDF repo URL     |
