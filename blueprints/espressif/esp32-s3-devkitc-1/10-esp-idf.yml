@@ -5,16 +5,43 @@
 # Tools land in $IDF_TOOLS_PATH/tools/<tool>/<version>, the layout idf_tools.py
 # expects, so export.sh picks them up without downloading anything.
 #
-- name: "Clone ESP-IDF"
-  action: "mcu_sdk"
-  method: "git"
-  url: "{{.Vars.IDF_URL}}"
-  version: "{{.Vars.IDF_VERSION}}"
-  dest: "{{.Vars.IDF_DEST}}"
-  owner: "{{.Vars.DEV_USERNAME}}"
-  vendor: "espressif"
-  sdk: "esp-idf"
-  creates: "{{.Vars.IDF_DEST}}/tools/idf.py"
+- name: "Clone ESP-IDF with shallow submodules"
+  action: "run_command"
+  reason: "mcu_sdk git fetches ESP-IDF's ~40 submodules at full depth (several GB) with no retry and no prompt suppression; one transient GitHub failure aborts the whole clone, and git then dies asking for credentials with no TTY (seen on Windows/VirtualBox NAT)."
+  command: |
+    set -e
+    # Never block on a credential prompt: fail the fetch instead, so the retry loop can do its job.
+    export GIT_TERMINAL_PROMPT=0
+    export GIT_ASKPASS=true
+    DEST="{{.Vars.IDF_DEST}}"
+
+    if [ ! -d "$DEST/.git" ]; then
+      rm -rf "$DEST"
+      git clone --depth 1 --branch "{{.Vars.IDF_VERSION}}" --single-branch "{{.Vars.IDF_URL}}" "$DEST"
+    fi
+
+    # Sequential fetches: parallel jobs make GitHub throttling more likely, not less.
+    git -C "$DEST" config submodule.fetchJobs 1
+
+    ok=0
+    for attempt in 1 2 3; do
+      if git -C "$DEST" submodule update --init --recursive --depth 1 --recommend-shallow; then
+        ok=1
+        break
+      fi
+      echo "alloy: submodule fetch attempt $attempt failed; retrying in $((attempt * 15))s" >&2
+      sleep $((attempt * 15))
+    done
+    # Last resort: a submodule pinned to a commit the server will not serve shallow.
+    if [ "$ok" != "1" ]; then
+      echo "alloy: retrying submodules at full depth" >&2
+      git -C "$DEST" submodule update --init --recursive
+    fi
+
+    chown -R "{{.Vars.DEV_USERNAME}}" "$DEST"
+    git config --system --add safe.directory "$DEST"
+  # tlsf.c only exists once submodules are checked out, so a partial clone re-runs.
+  creates: "{{.Vars.IDF_DEST}}/components/heap/tlsf/tlsf.c"
 
 - name: "Install Xtensa GCC (xtensa-esp32s3-elf)"
   action: "unarchive_from_ref"

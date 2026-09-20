@@ -53,3 +53,10 @@ The on-board RGB LED is a WS2812 on GPIO48 (GPIO38 on board v1.1). Set the pin w
 ## Upgrading ESP-IDF
 
 ESP-IDF only accepts the exact tool versions in its `tools/tools.json`. When you bump `IDF_VERSION`, add the matching versions to the catalog and update both the `toolchains:` refs and the `*_VER` directory names in `manifest.yml`.
+
+## Changelog
+
+| Version | Change |
+|---|---|
+| 1.0.1 | Clone ESP-IDF with shallow submodules, sequential fetch and retries. Fixes the `could not read Username for 'https://github.com'` abort during submodule checkout. |
+| 1.0.0 | Initial blueprint. |

@@ -4,7 +4,7 @@
 # Installs only the esp32s3 toolchain (Xtensa GCC, RISC-V ULP GCC, OpenOCD, GDB).
 #
 name: "Espressif ESP32-S3-DevKitC-1 Dev Environment"
-version: "1.0.0"
+version: "1.0.1"
 description: "ESP-IDF v5.4.1 with the ESP32-S3 toolchain, OpenOCD for built-in USB-JTAG, and udev rules for both DevKitC-1 USB ports."
 vendor: "Espressif Systems"
 licenses: "Apache-2.0"
