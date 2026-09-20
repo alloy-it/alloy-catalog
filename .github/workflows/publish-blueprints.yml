@@ -80,6 +80,11 @@ jobs:
   build-tool:
     name: Build alloy-cicd
     runs-on: ubuntu-latest
+    env:
+      GOPRIVATE: github.com/alloy-it/*
+      GIT_CONFIG_COUNT: '1'
+      GIT_CONFIG_KEY_0: 'url.https://x-access-token:${{ secrets.ALLOY_CORE_TOKEN }}@github.com/.insteadOf'
+      GIT_CONFIG_VALUE_0: 'https://github.com/'
     needs: detect-changes
     if: needs.detect-changes.outputs.has_changes == 'true'
     steps:
@@ -94,7 +99,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version-file: 'alloy-cicd/go.mod'
           cache: true
           cache-dependency-path: 'alloy-cicd/go.sum'
 
